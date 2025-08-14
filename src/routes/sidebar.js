@@ -17,7 +17,6 @@ import CurrencyDollarIcon from "@heroicons/react/24/outline/CurrencyDollarIcon";
 import UsersIcon from "@heroicons/react/24/outline/UsersIcon";
 import KeyIcon from "@heroicons/react/24/outline/KeyIcon";
 import DocumentDuplicateIcon from "@heroicons/react/24/outline/DocumentDuplicateIcon";
-import ClipboardDocumentListIcon from "@heroicons/react/24/outline/ClipboardDocumentListIcon";
 import IdentificationIcon from "@heroicons/react/24/outline/IdentificationIcon";
 import UserGroupIcon from "@heroicons/react/24/outline/UserGroupIcon";
 
@@ -32,7 +31,7 @@ const routes = [
   },
   {
     path: "/app/activities",
-    icon: <ClipboardDocumentListIcon className={iconClasses} />,
+    icon: <DocumentDuplicateIcon className={iconClasses} />,
     name: "Aktivitas",
   },
   {
@@ -49,6 +48,11 @@ const routes = [
     path: "/app/identity-verifications",
     icon: <IdentificationIcon className={iconClasses} />,
     name: "Verifikasi Identitas",
+  },
+  {
+    path: "/app/notaris-activities",
+    icon: <DocumentDuplicateIcon className={iconClasses} />,
+    name: "Aktivitas Notaris",
   },
   {
     path: "/app/leads",
