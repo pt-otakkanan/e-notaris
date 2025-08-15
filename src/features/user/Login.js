@@ -44,7 +44,7 @@ function Login() {
         backgroundColor: "#ccb0b2",
       }}
     >
-      <div className="card mx-auto w-full max-w-5xl shadow-xl rounded-xl overflow-hidden">
+      <div className="card mx-auto w-full max-w-5xl shadow-xl rounded-none md:rounded-xl overflow-hidden">
         <div
           className={`grid md:grid-cols-2 grid-cols-1`}
           style={{
@@ -60,7 +60,7 @@ function Login() {
             <LandingIntro />
           </div>
           <div className="py-24 px-10">
-            <h2 className="text-3xl font-bold mb-1 mt-[50px] text-center text-black">
+            <h2 className="text-3xl font-bold mb-1 text-center text-black">
               Selamat datang kembali!
             </h2>
             <div className="text-center mt-4 mb-6 text-black">
