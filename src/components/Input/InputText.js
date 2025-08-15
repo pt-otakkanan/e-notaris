@@ -1,24 +1,38 @@
-import { useState } from "react"
+import { color } from "chart.js/helpers";
+import { useState } from "react";
 
+function InputText({
+  labelTitle,
+  labelStyle,
+  type,
+  containerStyle,
+  defaultValue,
+  placeholder,
+  updateFormValue,
+  updateType,
+}) {
+  const [value, setValue] = useState(defaultValue);
 
-function InputText({labelTitle, labelStyle, type, containerStyle, defaultValue, placeholder, updateFormValue, updateType}){
+  const updateInputValue = (val) => {
+    setValue(val);
+    updateFormValue({ updateType, value: val });
+  };
 
-    const [value, setValue] = useState(defaultValue)
-
-    const updateInputValue = (val) => {
-        setValue(val)
-        updateFormValue({updateType, value : val})
-    }
-
-    return(
-        <div className={`form-control w-full ${containerStyle}`}>
-            <label className="label">
-                <span className={"label-text text-base-content " + labelStyle}>{labelTitle}</span>
-            </label>
-            <input type={type || "text"} value={value} placeholder={placeholder || ""} onChange={(e) => updateInputValue(e.target.value)}className="input  input-bordered w-full " />
-        </div>
-    )
+  return (
+    <div className={`form-control w-full ${containerStyle}`}>
+      <label className="label text-black text-bold">
+        <span className={"text-base-content" + labelStyle}>{labelTitle}</span>
+      </label>
+      <input
+        type={type || "text"}
+        value={value}
+        placeholder={placeholder || ""}
+        onChange={(e) => updateInputValue(e.target.value)}
+        className="input input-bordered w-full bg-base-200 text-base-content text-white"
+        style={{ backgroundColor: "#96696d" }}
+      />
+    </div>
+  );
 }
 
-
-export default InputText
+export default InputText;
