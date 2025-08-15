@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import LandingIntro from "./LandingIntro";
 import ErrorText from "../../components/Typography/ErrorText";
-import InputText from "../../components/Input/InputText";
+import InputTextAuth from "../../components/Input/InputTextAuth";
 
 function Register() {
   const INITIAL_REGISTER_OBJ = {
@@ -70,7 +70,7 @@ function Register() {
             </div>
             <form onSubmit={(e) => submitForm(e)}>
               <div className="mb-4">
-                <InputText
+                <InputTextAuth
                   defaultValue={registerObj.name}
                   updateType="name"
                   containerStyle="mt-4"
@@ -78,7 +78,7 @@ function Register() {
                   updateFormValue={updateFormValue}
                 />
 
-                <InputText
+                <InputTextAuth
                   defaultValue={registerObj.emailId}
                   updateType="emailId"
                   containerStyle="mt-4"
@@ -86,7 +86,7 @@ function Register() {
                   updateFormValue={updateFormValue}
                 />
 
-                <InputText
+                <InputTextAuth
                   defaultValue={registerObj.password}
                   type="password"
                   updateType="password"

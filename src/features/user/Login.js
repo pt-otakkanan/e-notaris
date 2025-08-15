@@ -2,8 +2,8 @@ import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import LandingIntro from "./LandingIntro";
 import ErrorText from "../../components/Typography/ErrorText";
-import InputText from "../../components/Input/InputText";
 import { color } from "chart.js/helpers";
+import InputTextAuth from "../../components/Input/InputTextAuth";
 
 function Login() {
   const INITIAL_LOGIN_OBJ = {
@@ -68,7 +68,7 @@ function Login() {
             </div>
             <form onSubmit={(e) => submitForm(e)}>
               <div className="mb-4">
-                <InputText
+                <InputTextAuth
                   type="emailId"
                   defaultValue={loginObj.emailId}
                   updateType="emailId"
@@ -77,7 +77,7 @@ function Login() {
                   updateFormValue={updateFormValue}
                 />
 
-                <InputText
+                <InputTextAuth
                   defaultValue={loginObj.password}
                   type="password"
                   updateType="password"

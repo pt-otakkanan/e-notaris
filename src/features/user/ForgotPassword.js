@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import LandingIntro from "./LandingIntro";
 import ErrorText from "../../components/Typography/ErrorText";
-import InputText from "../../components/Input/InputText";
+import InputTextAuth from "../../components/Input/InputTextAuth";
 import CheckCircleIcon from "@heroicons/react/24/solid/CheckCircleIcon";
 
 function ForgotPassword() {
@@ -87,7 +87,7 @@ function ForgotPassword() {
                 </p>
                 <form onSubmit={(e) => submitForm(e)}>
                   <div className="mb-4">
-                    <InputText
+                    <InputTextAuth
                       type="emailId"
                       defaultValue={userObj.emailId}
                       updateType="emailId"

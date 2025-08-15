@@ -2,7 +2,7 @@
 module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
-    "./node_modules/react-tailwindcss-datepicker/dist/index.esm.js"
+    "./node_modules/react-tailwindcss-datepicker/dist/index.esm.js",
   ],
   darkMode: ["class", '[data-theme="dark"]'],
   theme: {
@@ -13,4 +13,12 @@ module.exports = {
     themes: ["light", "dark"],
   },
 
-}
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ["Poppins", "sans-serif"], // ganti default sans jadi Poppins
+      },
+    },
+  },
+  plugins: [require("@tailwindcss/typography"), require("daisyui")],
+};
