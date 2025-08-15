@@ -9,6 +9,7 @@ const Page404 = lazy(() => import("../pages/protected/404"));
 const Blank = lazy(() => import("../pages/protected/Blank"));
 const Charts = lazy(() => import("../pages/protected/Charts"));
 const Leads = lazy(() => import("../pages/protected/Leads"));
+const Deeds = lazy(() => import("../pages/protected/Deeds"));
 const Users = lazy(() => import("../pages/protected/Users"));
 const IdentityVerification = lazy(() =>
   import("../pages/protected/IdentityVerification")
@@ -37,6 +38,10 @@ const routes = [
   {
     path: "/leads",
     component: Leads,
+  },
+  {
+    path: "/deeds",
+    component: Deeds,
   },
   {
     path: "/users",

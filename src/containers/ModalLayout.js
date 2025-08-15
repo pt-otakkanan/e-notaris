@@ -6,6 +6,8 @@ import AddLeadModalBody from "../features/leads/components/AddLeadModalBody";
 import ConfirmationModalBody from "../features/common/components/ConfirmationModalBody";
 import UserDetailModalBody from "../features/users/components/UserModalDetailBody";
 import NotarisActivityDetailModalBody from "../features/notarisactivities/components/NotarisActivityDetailModalBody";
+import DeedDetailModalBody from "../features/deeds/components/DeedDetailModalBody";
+import DeedAddRequirementModalBody from "../features/deeds/components/DeedAddRequirementModalBody";
 
 function ModalLayout() {
   const { isOpen, bodyType, size, extraObject, title } = useSelector(
@@ -43,6 +45,19 @@ function ModalLayout() {
               ),
               [MODAL_BODY_TYPES.CONFIRMATION]: (
                 <ConfirmationModalBody
+                  extraObject={extraObject}
+                  closeModal={close}
+                />
+              ),
+
+              [MODAL_BODY_TYPES.DEED_DETAIL]: (
+                <DeedDetailModalBody
+                  extraObject={extraObject}
+                  closeModal={close}
+                />
+              ),
+              [MODAL_BODY_TYPES.DEED_ADD_REQUIREMENT]: (
+                <DeedAddRequirementModalBody
                   extraObject={extraObject}
                   closeModal={close}
                 />

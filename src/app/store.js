@@ -7,6 +7,7 @@ import userSlice from "../features/users/userSlice";
 import identityVerificationSlice from "../features/identityverifications/identityVerificationSlice";
 
 import notarisActivitiesSlice from "../features/notarisactivities/notarisActivitiesSlice";
+import deedSlice from "../features/deeds/deedSlice";
 
 const combinedReducer = {
   header: headerSlice,
@@ -16,6 +17,7 @@ const combinedReducer = {
   user: userSlice,
   identityVerification: identityVerificationSlice,
   notarisActivities: notarisActivitiesSlice,
+  deed: deedSlice,
 };
 
 export default configureStore({ reducer: combinedReducer });
