@@ -20,16 +20,17 @@ function InputText({
 
   return (
     <div className={`form-control w-full ${containerStyle}`}>
-      <label className="label text-black text-bold">
-        <span className={"text-base-content" + labelStyle}>{labelTitle}</span>
+      <label className="label">
+        <span className={"label-text text-base-content " + labelStyle}>
+          {labelTitle}
+        </span>
       </label>
       <input
         type={type || "text"}
         value={value}
         placeholder={placeholder || ""}
         onChange={(e) => updateInputValue(e.target.value)}
-        className="input input-bordered w-full bg-base-200 text-base-content text-white"
-        style={{ backgroundColor: "#96696d" }}
+        className="input input-bordered w-full"
       />
     </div>
   );
