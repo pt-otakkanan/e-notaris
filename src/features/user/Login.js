@@ -64,12 +64,7 @@ function Login() {
               Selamat datang kembali!
             </h2>
             <div className="text-center mt-4 mb-6 text-black">
-              Belum punya akun?{" "}
-              <Link to="/register">
-                <span className="text-black inline-block  hover:text-primary hover:underline hover:cursor-pointer transition duration-200">
-                  Daftar
-                </span>
-              </Link>
+              Masukkan detail Anda.{" "}
             </div>
             <form onSubmit={(e) => submitForm(e)}>
               <div className="mb-4">
@@ -78,7 +73,7 @@ function Login() {
                   defaultValue={loginObj.emailId}
                   updateType="emailId"
                   containerStyle="mt-4"
-                  labelTitle="Email Id"
+                  labelTitle="Email"
                   updateFormValue={updateFormValue}
                 />
 
@@ -87,7 +82,7 @@ function Login() {
                   type="password"
                   updateType="password"
                   containerStyle="mt-4"
-                  labelTitle="Password"
+                  labelTitle="Kata Sandi"
                   updateFormValue={updateFormValue}
                 />
               </div>
@@ -103,7 +98,7 @@ function Login() {
               <ErrorText styleClass="mt-8 text-sm italic">
                 {errorMessage}
               </ErrorText>
-              <div className="flex justify-center">
+              <div className="justify-center text-center">
                 <button
                   type="submit"
                   className={
@@ -118,6 +113,15 @@ function Login() {
                 >
                   Masuk
                 </button>
+
+                <div className="text-center mt-4 text-black">
+                  Belum punya akun?{" "}
+                  <Link to="/register">
+                    <span className="text-black inline-block  hover:text-primary hover:underline hover:cursor-pointer transition duration-200">
+                      Daftar
+                    </span>
+                  </Link>
+                </div>
               </div>
             </form>
           </div>

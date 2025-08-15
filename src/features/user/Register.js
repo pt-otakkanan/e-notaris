@@ -40,23 +40,41 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-base-200 flex items-center">
+    <div
+      className="min-h-screen bg-base-200 flex items-center"
+      style={{
+        backgroundColor: "#ccb0b2",
+      }}
+    >
       <div className="card mx-auto w-full max-w-5xl  shadow-xl">
-        <div className="grid  md:grid-cols-2 grid-cols-1  bg-base-100 rounded-xl">
-          <div className="">
+        <div
+          className="grid  md:grid-cols-2 grid-cols-1  bg-base-100 rounded-xl"
+          style={{
+            background: "linear-gradient(180deg, #ffffff 0%, #ccb0b2 100%)",
+          }}
+        >
+          <div
+            className="rounded-xl"
+            style={{
+              backgroundColor: "#96696d",
+            }}
+          >
             <LandingIntro />
           </div>
           <div className="py-24 px-10">
-            <h2 className="text-2xl font-semibold mb-2 text-center">
-              Register
+            <h2 className="text-3xl font-bold mb-1 mt-[50px] text-center text-black">
+              Selamat datang!
             </h2>
+            <div className="text-center mt-4 mb-6 text-black">
+              Masukkan detail Anda.{" "}
+            </div>
             <form onSubmit={(e) => submitForm(e)}>
               <div className="mb-4">
                 <InputText
                   defaultValue={registerObj.name}
                   updateType="name"
                   containerStyle="mt-4"
-                  labelTitle="Name"
+                  labelTitle="Nama"
                   updateFormValue={updateFormValue}
                 />
 
@@ -64,7 +82,7 @@ function Register() {
                   defaultValue={registerObj.emailId}
                   updateType="emailId"
                   containerStyle="mt-4"
-                  labelTitle="Email Id"
+                  labelTitle="Email"
                   updateFormValue={updateFormValue}
                 />
 
@@ -73,28 +91,36 @@ function Register() {
                   type="password"
                   updateType="password"
                   containerStyle="mt-4"
-                  labelTitle="Password"
+                  labelTitle="Kata Sandi"
                   updateFormValue={updateFormValue}
                 />
               </div>
 
               <ErrorText styleClass="mt-8">{errorMessage}</ErrorText>
-              <button
-                type="submit"
-                className={
-                  "btn mt-2 w-full btn-primary" + (loading ? " loading" : "")
-                }
-              >
-                Register
-              </button>
+              <div className="justify-center text-center">
+                <button
+                  type="submit"
+                  className={
+                    "btn mt-1 w-60 border-r-0 text-white text-lg rounded-full border-gray-300 p-2 w-72 placeholder-gray-500" +
+                    (loading ? " loading" : "")
+                  }
+                  style={{
+                    backgroundColor: "#474747",
+                    width: "240px",
+                    height: "45px",
+                  }}
+                >
+                  Daftar
+                </button>
 
-              <div className="text-center mt-4">
-                Already have an account?{" "}
-                <Link to="/login">
-                  <span className="  inline-block  hover:text-primary hover:underline hover:cursor-pointer transition duration-200">
-                    Login
-                  </span>
-                </Link>
+                <div className="text-center mt-4 text-black">
+                  Sudah punya akun?{" "}
+                  <Link to="/login">
+                    <span className="text-black inline-block  hover:text-primary hover:underline hover:cursor-pointer transition duration-200">
+                      Masuk
+                    </span>
+                  </Link>
+                </div>
               </div>
             </form>
           </div>
