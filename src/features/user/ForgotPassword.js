@@ -92,7 +92,7 @@ function ForgotPassword() {
                       defaultValue={userObj.emailId}
                       updateType="emailId"
                       containerStyle="mt-4"
-                      labelTitle="Email Id"
+                      labelTitle="Email"
                       updateFormValue={updateFormValue}
                     />
                   </div>
