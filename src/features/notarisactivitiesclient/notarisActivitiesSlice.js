@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import moment from "moment";
 
 // Dummy generator lengkap
 const generateDummyActivities = (count = 10) => {
@@ -69,11 +70,64 @@ const generateDummyActivities = (count = 10) => {
     )} ${kodePos}`;
   };
 
+  // Generate dummy schedule data
+  const generateSchedule = (i) => {
+    // 70% kemungkinan ada jadwal
+    if (Math.random() > 0.3) {
+      const daysFromNow = rand(-7, 30); // 7 hari lalu sampai 30 hari ke depan
+      const hour = rand(8, 17);
+      const minute = rand(0, 1) * 30; // 0 atau 30 menit
+
+      const scheduledDate = moment()
+        .add(daysFromNow, "days")
+        .hour(hour)
+        .minute(minute)
+        .second(0)
+        .toISOString();
+
+      const locations = [
+        "Kantor Notaris - Jl. Sudirman No. 123, Surabaya",
+        "Rumah Klien - Sesuai alamat penghadap 1",
+        "Kantor Notaris - Jl. Ahmad Yani No. 45, Sidoarjo",
+        "Hotel Grand City - Meeting Room A",
+        "Kantor Bank BCA Cabang Surabaya",
+        "Rumah Penghadap 2",
+        "Kantor Notaris Cabang Gresik",
+      ];
+
+      const notesList = [
+        "Mohon membawa dokumen asli KTP dan KK. Dokumen fotocopy sudah disiapkan.",
+        "Pertemuan untuk penandatanganan akta. Harap datang tepat waktu.",
+        "Bawa materai 10.000 sebanyak 2 lembar. Dokumen lain sudah lengkap.",
+        "Meeting untuk pembacaan draft akta sebelum penandatanganan final.",
+        "Persiapkan bilik administrasi dan uang tunai untuk pembayaran.",
+        "",
+        "Konfirmasi kehadiran H-1 melalui WhatsApp atau telepon.",
+      ];
+
+      return {
+        scheduled_date: scheduledDate,
+        schedule_location: pick(locations),
+        schedule_notes: pick(notesList),
+        schedule_status: "confirmed",
+      };
+    }
+
+    return {
+      scheduled_date: null,
+      schedule_location: null,
+      schedule_notes: null,
+      schedule_status: null,
+    };
+  };
+
   return Array.from({ length: count }, (_, i) => {
     const p1_first = pick(first),
       p1_last = pick(last);
     const p2_first = pick(first),
       p2_last = pick(last);
+
+    const scheduleData = generateSchedule(i);
 
     return {
       id: i + 1,
@@ -99,6 +153,9 @@ const generateDummyActivities = (count = 10) => {
       penghadap2_phone: phone(),
       penghadap1_address: addr(),
       penghadap2_address: addr(),
+
+      // SCHEDULE DATA
+      ...scheduleData,
     };
   });
 };

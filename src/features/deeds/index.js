@@ -143,7 +143,7 @@ function Deeds() {
         </div>
       ) : (
         <div className="overflow-x-auto w-full">
-          <table className="table min-w-[1000px]">
+          <table className="table w-full [&_th]:whitespace-nowrap [&_td]:whitespace-nowrap">
             <thead>
               <tr>
                 <th className="whitespace-nowrap">Nama</th>

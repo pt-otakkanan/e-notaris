@@ -6,6 +6,8 @@ import AddLeadModalBody from "../features/leads/components/AddLeadModalBody";
 import ConfirmationModalBody from "../features/common/components/ConfirmationModalBody";
 import UserDetailModalBody from "../features/users/components/UserModalDetailBody";
 import NotarisActivityDetailModalBody from "../features/notarisactivities/components/NotarisActivityDetailModalBody";
+import NotarisActivityScheduleModalBody from "../features/notarisactivities/components/NotarisActivityScheduleModalBody";
+import NotarisActivityScheduleDetailModalBody from "../features/notarisactivitiesclient/components/NotarisActivityScheduleModalBody";
 import DeedDetailModalBody from "../features/deeds/components/DeedDetailModalBody";
 import DeedAddRequirementModalBody from "../features/deeds/components/DeedAddRequirementModalBody";
 import DeedAddModalBody from "../features/deeds/components/DeedAddModalBody";
@@ -95,6 +97,18 @@ function ModalLayout() {
 
               [MODAL_BODY_TYPES.NOTARIS_ACTIVITY_DETAIL]: (
                 <NotarisActivityDetailModalBody
+                  extraObject={extraObject}
+                  closeModal={close}
+                />
+              ),
+              [MODAL_BODY_TYPES.NOTARIS_ACTIVITY_SCHEDULE]: (
+                <NotarisActivityScheduleModalBody
+                  extraObject={extraObject}
+                  closeModal={close}
+                />
+              ),
+              [MODAL_BODY_TYPES.NOTARIS_ACTIVITY_SCHEDULE_DETAIL]: (
+                <NotarisActivityScheduleDetailModalBody
                   extraObject={extraObject}
                   closeModal={close}
                 />

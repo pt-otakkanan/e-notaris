@@ -10,6 +10,7 @@ import {
   CONFIRMATION_MODAL_CLOSE_TYPES,
 } from "../../utils/globalConstantUtil";
 import MagnifyingGlassIcon from "@heroicons/react/24/outline/MagnifyingGlassIcon";
+import CalendarIcon from "@heroicons/react/24/outline/CalendarIcon";
 import {
   getNotarisActivitiesContent,
   deleteNotarisActivity,
@@ -61,6 +62,26 @@ function NotarisActivities() {
     );
   };
 
+  // Buka modal penjadwalan
+  const openScheduleModal = (row) => {
+    dispatch(
+      openModal({
+        title: "Penjadwalan Aktivitas",
+        bodyType: MODAL_BODY_TYPES.NOTARIS_ACTIVITY_SCHEDULE,
+        extraObject: {
+          activity: row,
+          existingSchedule: row.scheduled_date || null,
+          onSubmit: (scheduleData) => {
+            // Handle submit penjadwalan
+            console.log("Schedule data:", scheduleData);
+            // Di sini Anda bisa dispatch action untuk update jadwal
+          },
+        },
+        size: "lg",
+      })
+    );
+  };
+
   // Hapus activity
   const askDelete = (index) => {
     dispatch(
@@ -87,6 +108,38 @@ function NotarisActivities() {
           "inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 inset-ring inset-ring-red-600/10",
       }[status] || "badge-ghost";
     return <div className={`badge ${cls}`}>{status || "Tidak diketahui"}</div>;
+  };
+
+  const renderScheduleButton = (row) => {
+    const hasSchedule = row.scheduled_date;
+
+    if (hasSchedule) {
+      return (
+        <div className="flex flex-col items-center gap-1">
+          <button
+            className="btn btn-sm btn-outline btn-success"
+            onClick={() => openScheduleModal(row)}
+          >
+            Terjadwal
+          </button>
+          <div className="text-xs text-gray-600">
+            {moment(row.scheduled_date).format("DD MMM YYYY")}
+          </div>
+          <div className="text-xs text-gray-600">
+            {moment(row.scheduled_date).format("HH:mm")}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <button
+        className="btn btn-sm btn-outline btn-primary"
+        onClick={() => openScheduleModal(row)}
+      >
+        Jadwalkan
+      </button>
+    );
   };
 
   // Filter pencarian
@@ -177,7 +230,7 @@ function NotarisActivities() {
         </div>
       ) : (
         <div className="overflow-x-auto w-full">
-          <table className="table w-full">
+          <table className="table w-full [&_th]:whitespace-nowrap [&_td]:whitespace-nowrap">
             <thead>
               <tr>
                 <th>Kode</th>
@@ -186,8 +239,8 @@ function NotarisActivities() {
                 <th>Penghadap 2</th>
                 <th>Dokumen Tambahan</th>
                 <th>Draft Akta</th>
+                <th>Penjadwalan</th>
                 <th>Status</th>
-                {/* <th>Waktu</th> */}
                 <th>Aksi</th>
               </tr>
             </thead>
@@ -202,7 +255,6 @@ function NotarisActivities() {
                     <Link
                       to="/app/document-requirement"
                       className="link link-primary"
-                      target="_blank"
                       rel="noreferrer"
                     >
                       Lihat
@@ -212,18 +264,13 @@ function NotarisActivities() {
                     <a
                       href={row.draft_akta}
                       className="link link-primary"
-                      target="_blank"
                       rel="noreferrer"
                     >
                       Lihat
                     </a>
                   </td>
+                  <td className="text-center">{renderScheduleButton(row)}</td>
                   <td>{renderStatusBadge(row.status)}</td>
-                  {/* <td>
-                    {moment(row.waktu || new Date()).format(
-                      "DD MMM YYYY HH:mm"
-                    )}
-                  </td> */}
                   <td className="flex">
                     <button
                       className="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1.5 text-center me-2 mb-2 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-800"

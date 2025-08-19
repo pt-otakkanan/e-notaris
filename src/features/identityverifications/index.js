@@ -128,7 +128,7 @@ function IdentityVerifications() {
         </div>
       ) : (
         <div className="overflow-x-auto w-full">
-          <table className="table w-full">
+          <table className="table w-full [&_th]:whitespace-nowrap [&_td]:whitespace-nowrap">
             <thead>
               <tr>
                 <th>Nama</th>
