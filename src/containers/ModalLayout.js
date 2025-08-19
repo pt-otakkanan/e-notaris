@@ -8,6 +8,9 @@ import UserDetailModalBody from "../features/users/components/UserModalDetailBod
 import NotarisActivityDetailModalBody from "../features/notarisactivities/components/NotarisActivityDetailModalBody";
 import DeedDetailModalBody from "../features/deeds/components/DeedDetailModalBody";
 import DeedAddRequirementModalBody from "../features/deeds/components/DeedAddRequirementModalBody";
+import DeedAddModalBody from "../features/deeds/components/DeedAddModalBody";
+import NotarisActivityAddModalBody from "../features/notarisactivities/components/NotarisActivityAddModalBody";
+import NotarisActivityEditModalBody from "../features/notarisactivities/components/NotarisActivityEditModalBody";
 
 function ModalLayout() {
   const { isOpen, bodyType, size, extraObject, title } = useSelector(
@@ -58,6 +61,26 @@ function ModalLayout() {
               ),
               [MODAL_BODY_TYPES.DEED_ADD_REQUIREMENT]: (
                 <DeedAddRequirementModalBody
+                  extraObject={extraObject}
+                  closeModal={close}
+                />
+              ),
+              [MODAL_BODY_TYPES.DEED_ADD]: (
+                <DeedAddModalBody
+                  extraObject={extraObject}
+                  closeModal={close}
+                />
+              ),
+
+              [MODAL_BODY_TYPES.NOTARIS_ACTIVITY_ADD]: (
+                <NotarisActivityAddModalBody
+                  extraObject={extraObject}
+                  closeModal={close}
+                />
+              ),
+
+              [MODAL_BODY_TYPES.NOTARIS_ACTIVITY_EDIT]: (
+                <NotarisActivityEditModalBody
                   extraObject={extraObject}
                   closeModal={close}
                 />
