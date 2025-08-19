@@ -41,6 +41,15 @@ function Deeds() {
     );
   };
 
+  const openAddModal = () => {
+    dispatch(
+      openModal({
+        title: "Add New Lead",
+        bodyType: MODAL_BODY_TYPES.DEED_ADD,
+      })
+    );
+  };
+
   const addRequirement = (row) => {
     dispatch(
       openModal({
@@ -81,6 +90,16 @@ function Deeds() {
         <button className="btn btn-sm join-item" type="button">
           <MagnifyingGlassIcon className="w-4 h-4" />
         </button>
+      </div>
+      <div>
+        <div className="inline-block float-right">
+          <button
+            className="btn px-6 btn-sm normal-case btn-primary"
+            onClick={() => openAddModal()}
+          >
+            Tambah
+          </button>
+        </div>
       </div>
       {query ? (
         <button

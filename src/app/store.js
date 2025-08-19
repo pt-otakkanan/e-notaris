@@ -7,6 +7,7 @@ import userSlice from "../features/users/userSlice";
 import identityVerificationSlice from "../features/identityverifications/identityVerificationSlice";
 
 import notarisActivitiesSlice from "../features/notarisactivities/notarisActivitiesSlice";
+import notarisActivitiesClientSlice from "../features/notarisactivitiesclient/notarisActivitiesSlice";
 import deedSlice from "../features/deeds/deedSlice";
 
 const combinedReducer = {
@@ -17,6 +18,7 @@ const combinedReducer = {
   user: userSlice,
   identityVerification: identityVerificationSlice,
   notarisActivities: notarisActivitiesSlice,
+  notarisActivitiesClient: notarisActivitiesClientSlice,
   deed: deedSlice,
 };
 

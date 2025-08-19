@@ -1,6 +1,6 @@
 import moment from "moment";
-import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import TitleCard from "../../components/Cards/TitleCard";
 import { openModal } from "../common/modalSlice";
@@ -13,7 +13,7 @@ import MagnifyingGlassIcon from "@heroicons/react/24/outline/MagnifyingGlassIcon
 import {
   getNotarisActivitiesContent,
   deleteNotarisActivity,
-} from "./notarisActivitiesSlice";
+} from "../notarisactivitiesclient/notarisActivitiesSlice";
 
 function NotarisActivities() {
   const { items = [], isLoading = false } = useSelector(
@@ -39,37 +39,28 @@ function NotarisActivities() {
     );
   };
 
-  const openAddModal = () => {
-    dispatch(
-      openModal({
-        title: "Tambah Aktivitas Notaris",
-        bodyType: MODAL_BODY_TYPES.NOTARIS_ACTIVITY_ADD,
-        size: "lg",
-      })
-    );
-  };
-
-  // Edit activity
-  const openEdit = (row) => {
-    dispatch(
-      openModal({
-        title: "Edit Aktivitas Notaris",
-        bodyType: MODAL_BODY_TYPES.NOTARIS_ACTIVITY_EDIT,
-        extraObject: row,
-        size: "lg",
-      })
-    );
-  };
-
-  // Hapus activity
-  const askDelete = (index) => {
+  const approveVerification = (row) => {
     dispatch(
       openModal({
         title: "Konfirmasi",
         bodyType: MODAL_BODY_TYPES.CONFIRMATION,
         extraObject: {
-          message: "Yakin ingin menghapus aktivitas ini?",
-          type: CONFIRMATION_MODAL_CLOSE_TYPES.LEAD_DELETE,
+          message: `Yakin ingin menyetujui aktivitas ini`,
+          type: "IDV_APPROVE",
+          row,
+        },
+      })
+    );
+  };
+
+  const rejectVerification = (index) => {
+    dispatch(
+      openModal({
+        title: "Konfirmasi",
+        bodyType: MODAL_BODY_TYPES.CONFIRMATION,
+        extraObject: {
+          message: `Yakin ingin menolak aktivitas ini?`,
+          type: "IDV_REJECT",
           index,
         },
       })
@@ -128,16 +119,6 @@ function NotarisActivities() {
           <MagnifyingGlassIcon className="w-4 h-4" />
         </button>
       </div>
-      <div>
-        <div className="inline-block float-right">
-          <button
-            className="btn px-6 btn-sm normal-case btn-primary"
-            onClick={() => openAddModal()}
-          >
-            Tambah
-          </button>
-        </div>
-      </div>
       {query ? (
         <button className="btn btn-sm btn-ghost" onClick={() => setQuery("")}>
           Reset
@@ -149,7 +130,7 @@ function NotarisActivities() {
   if (isLoading) {
     return (
       <TitleCard
-        title="Aktivitas Notaris"
+        title="Aktivitas Notaris - Penghadap"
         topMargin="mt-2"
         TopSideButtons={TopSideButtons}
       >
@@ -160,7 +141,7 @@ function NotarisActivities() {
 
   return (
     <TitleCard
-      title="Aktivitas Notaris"
+      title="Aktivitas Notaris - Penghadap"
       topMargin="mt-2"
       TopSideButtons={TopSideButtons}
     >
@@ -232,16 +213,16 @@ function NotarisActivities() {
                       Detail
                     </button>
                     <button
-                      className="text-yellow-700 hover:text-white border border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-3 py-1.5 text-center me-2 mb-2 dark:border-yellow-500 dark:text-yellow-500 dark:hover:text-white dark:hover:bg-yellow-600 dark:focus:ring-yellow-800"
-                      onClick={() => openEdit(row)}
+                      className="text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-3 py-1.5 text-center me-2 mb-2 dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800"
+                      onClick={() => approveVerification(row)} // fungsi setujui
                     >
-                      Edit
+                      Setujui
                     </button>
                     <button
                       className="text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-1.5 text-center me-2 mb-2 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-800"
-                      onClick={() => askDelete(k)}
+                      onClick={() => rejectVerification(k)} // fungsi tolak
                     >
-                      Hapus
+                      Tolak
                     </button>
                   </td>
                 </tr>

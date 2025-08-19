@@ -2,6 +2,7 @@
 
 import { lazy } from "react";
 import NotarisActivities from "../features/notarisactivities";
+import NotarisActivitiesClient from "../features/notarisactivitiesclient";
 
 const Dashboard = lazy(() => import("../pages/protected/Dashboard"));
 const Welcome = lazy(() => import("../pages/protected/Welcome"));
@@ -50,6 +51,10 @@ const routes = [
   {
     path: "/notaris-activities",
     component: NotarisActivities,
+  },
+  {
+    path: "/notaris-activities-client",
+    component: NotarisActivitiesClient,
   },
   {
     path: "/identity-verifications",
