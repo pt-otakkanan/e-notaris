@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import LandingIntro from "./LandingIntro";
-// ErrorText tidak dipakai lagi untuk error utama, tapi biarkan import jika masih dipakai di tempat lain
-// import ErrorText from "../../components/Typography/ErrorText";
+import ErrorText from "../../components/Typography/ErrorText";
+import InputTextAuth from "../../components/Input/InputTextAuth";
 import InputText from "../../components/Input/InputText";
 import CheckCardGroup from "../../components/Input/CheckCardGroup";
-
 import ScaleIcon from "@heroicons/react/24/outline/ScaleIcon";
 import UserIcon from "@heroicons/react/24/outline/UserIcon";
 
@@ -107,8 +106,7 @@ function Register() {
 
             <form onSubmit={submitForm}>
               <div className="mb-4">
-                {/* Nama Lengkap */}
-                <InputText
+                <InputTextAuth
                   defaultValue={registerObj.name}
                   updateType="name"
                   containerStyle="mt-4"
@@ -116,8 +114,7 @@ function Register() {
                   updateFormValue={updateFormValue}
                 />
 
-                {/* Email */}
-                <InputText
+                <InputTextAuth
                   defaultValue={registerObj.emailId}
                   updateType="emailId"
                   containerStyle="mt-4"
@@ -125,8 +122,7 @@ function Register() {
                   updateFormValue={updateFormValue}
                 />
 
-                {/* Kata Sandi */}
-                <InputText
+                <InputTextAuth
                   defaultValue={registerObj.password}
                   type="password"
                   updateType="password"

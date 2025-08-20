@@ -12,4 +12,13 @@ module.exports = {
   daisyui: {
     themes: ["light", "dark"],
   },
+
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ["Poppins", "sans-serif"], // ganti default sans jadi Poppins
+      },
+    },
+  },
+  plugins: [require("@tailwindcss/typography"), require("daisyui")],
 };

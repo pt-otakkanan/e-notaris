@@ -1,3 +1,18 @@
+/* Target hanya menu di sidebar kiri */
+.drawer-side .menu li > *:active,
+.drawer-side .menu li > *.active {
+  background-color: #96696d !important; /* warna klik light mode */
+  color: #000 !important; /* warna teks */
+}
+
+[data-theme="dark"] .drawer-side .menu li > *:active,
+[data-theme="dark"] .drawer-side .menu li > *.active {
+  background-color: #0e4356 !important; /* warna klik dark mode */
+  color: #fff !important;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap");
+
 .App {
   text-align: center;
 }
