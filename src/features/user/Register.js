@@ -1,37 +1,60 @@
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import LandingIntro from "./LandingIntro";
 import ErrorText from "../../components/Typography/ErrorText";
 import InputTextAuth from "../../components/Input/InputTextAuth";
+import InputText from "../../components/Input/InputText";
+import CheckCardGroup from "../../components/Input/CheckCardGroup";
+import ScaleIcon from "@heroicons/react/24/outline/ScaleIcon";
+import UserIcon from "@heroicons/react/24/outline/UserIcon";
 
 function Register() {
   const INITIAL_REGISTER_OBJ = {
     name: "",
-    password: "",
     emailId: "",
+    password: "",
+    confirmPassword: "",
+    role: "", // "notaris" | "klien"
   };
 
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [registerObj, setRegisterObj] = useState(INITIAL_REGISTER_OBJ);
 
+  // Auto-dismiss alert setelah 4 detik
+  useEffect(() => {
+    if (!errorMessage) return;
+    const timer = setTimeout(() => setErrorMessage(""), 4000);
+    return () => clearTimeout(timer);
+  }, [errorMessage]);
+
   const submitForm = (e) => {
     e.preventDefault();
     setErrorMessage("");
 
     if (registerObj.name.trim() === "")
-      return setErrorMessage("Name is required! (use any value)");
+      return setErrorMessage("Nama Lengkap wajib diisi.");
     if (registerObj.emailId.trim() === "")
-      return setErrorMessage("Email Id is required! (use any value)");
+      return setErrorMessage("Email wajib diisi.");
     if (registerObj.password.trim() === "")
-      return setErrorMessage("Password is required! (use any value)");
-    else {
-      setLoading(true);
-      // Call API
-      localStorage.setItem("token", "DumyTokenHere");
-      setLoading(false);
-      window.location.href = "/app/welcome";
-    }
+      return setErrorMessage("Kata Sandi wajib diisi.");
+    if (registerObj.confirmPassword.trim() === "")
+      return setErrorMessage("Konfirmasi Kata Sandi wajib diisi.");
+    if (registerObj.password !== registerObj.confirmPassword)
+      return setErrorMessage("Kata Sandi dan Konfirmasi tidak cocok.");
+    if (!registerObj.role)
+      return setErrorMessage("Pilih peran: Notaris atau Klien.");
+
+    setLoading(true);
+    // TODO: panggil API register di sini
+    localStorage.setItem("token", "DumyTokenHere");
+    localStorage.setItem("role", registerObj.role);
+    localStorage.setItem("pendingEmail", registerObj.emailId); // untuk halaman verifikasi (opsional)
+    setLoading(false);
+
+    const target =
+      registerObj.role === "notaris" ? "/app/notaris/setup" : "/app/welcome";
+    window.location.href = target;
   };
 
   const updateFormValue = ({ updateType, value }) => {
@@ -42,39 +65,52 @@ function Register() {
   return (
     <div
       className="min-h-screen bg-base-200 flex items-center"
-      style={{
-        backgroundColor: "#ccb0b2",
-      }}
+      style={{ backgroundColor: "#ccb0b2" }}
     >
-      <div className="card mx-auto w-full max-w-5xl  shadow-xl">
+      <div className="card mx-auto w-full max-w-5xl shadow-xl">
         <div
-          className="grid  md:grid-cols-2 grid-cols-1  bg-base-100 rounded-none md:rounded-xl"
+          className="grid md:grid-cols-2 grid-cols-1 bg-base-100 rounded-none md:rounded-xl"
           style={{
             background: "linear-gradient(180deg, #ffffff 0%, #ccb0b2 100%)",
           }}
         >
-          <div
-            className="rounded-xl"
-            style={{
-              backgroundColor: "#96696d",
-            }}
-          >
+          <div className="rounded-xl" style={{ backgroundColor: "#96696d" }}>
             <LandingIntro />
           </div>
-          <div className="py-15 px-10">
+
+          {/* Kolom kanan dibuat scrollable */}
+          <div className="py-15 px-10 md:max-h-[80vh] md:overflow-y-auto">
             <h2 className="text-3xl font-bold mt-[65px] mb-1 text-center text-black">
               Selamat datang!
             </h2>
-            <div className="text-center mt-4 mb-6 text-black">
-              Masukkan detail Anda.{" "}
+            <div className="text-center mt-4 mb-4 text-black">
+              Masukkan detail Anda.
             </div>
-            <form onSubmit={(e) => submitForm(e)}>
+
+            {/* ALERT ERROR di bawah "Masukkan detail Anda." */}
+            {errorMessage && (
+              <div className="mb-6 relative">
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded text-sm text-center relative">
+                  {errorMessage}
+                  <button
+                    type="button"
+                    className="absolute right-2 top-1 text-red-700 font-bold"
+                    onClick={() => setErrorMessage("")}
+                    aria-label="Tutup alert"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={submitForm}>
               <div className="mb-4">
                 <InputTextAuth
                   defaultValue={registerObj.name}
                   updateType="name"
                   containerStyle="mt-4"
-                  labelTitle="Nama"
+                  labelTitle="Nama Lengkap"
                   updateFormValue={updateFormValue}
                 />
 
@@ -94,10 +130,43 @@ function Register() {
                   labelTitle="Kata Sandi"
                   updateFormValue={updateFormValue}
                 />
+
+                {/* Konfirmasi Kata Sandi */}
+                <InputText
+                  defaultValue={registerObj.confirmPassword}
+                  type="password"
+                  updateType="confirmPassword"
+                  containerStyle="mt-4"
+                  labelTitle="Konfirmasi Kata Sandi"
+                  updateFormValue={updateFormValue}
+                />
+
+                {/* Pilihan Peran (checkbox-look, radio-behavior) */}
+                <CheckCardGroup
+                  labelTitle=""
+                  labelDescription="Pilih peran Anda dalam sistem"
+                  containerStyle="mt-4"
+                  options={[
+                    {
+                      name: "Notaris",
+                      value: "notaris",
+                      description: "",
+                      icon: <ScaleIcon className="w-6 h-6" />,
+                    },
+                    {
+                      name: "Klien",
+                      value: "klien",
+                      description: "",
+                      icon: <UserIcon className="w-6 h-6" />,
+                    },
+                  ]}
+                  defaultValue={registerObj.role || ""}
+                  updateType="role"
+                  updateFormValue={updateFormValue}
+                />
               </div>
 
-              <ErrorText styleClass="mt-8">{errorMessage}</ErrorText>
-              <div className="justify-center text-center">
+              <div className="justify-center text-center pb-6">
                 <button
                   type="submit"
                   className={
@@ -116,7 +185,7 @@ function Register() {
                 <div className="text-center mt-4 text-black">
                   Sudah punya akun?{" "}
                   <Link to="/login">
-                    <span className="text-black inline-block  hover:text-primary hover:underline hover:cursor-pointer transition duration-200">
+                    <span className="text-black inline-block hover:text-primary hover:underline hover:cursor-pointer transition duration-200">
                       Masuk
                     </span>
                   </Link>
@@ -124,6 +193,7 @@ function Register() {
               </div>
             </form>
           </div>
+          {/* /Kolom kanan */}
         </div>
       </div>
     </div>

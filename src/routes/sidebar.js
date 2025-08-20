@@ -29,11 +29,11 @@ const routes = [
     icon: <Squares2X2Icon className={iconClasses} />,
     name: "Dashboard",
   },
-  {
-    path: "/app/activities",
-    icon: <DocumentDuplicateIcon className={iconClasses} />,
-    name: "Aktivitas",
-  },
+  // {
+  //   path: "/app/activities",
+  //   icon: <DocumentDuplicateIcon className={iconClasses} />,
+  //   name: "Aktivitas",
+  // },
   {
     path: "/app/deeds",
     icon: <DocumentTextIcon className={iconClasses} />,
@@ -55,106 +55,111 @@ const routes = [
     name: "Aktivitas Notaris",
   },
   {
-    path: "/app/leads",
-    icon: <UsersIcon className={iconClasses} />,
-    name: "Leads",
+    path: "/app/notaris-activities-client",
+    icon: <DocumentDuplicateIcon className={iconClasses} />,
+    name: "Aktivitas Notaris (Penghadap)",
   },
-  {
-    path: "/app/transactions",
-    icon: <CurrencyDollarIcon className={iconClasses} />,
-    name: "Transactions",
-  },
-  {
-    path: "/app/charts",
-    icon: <ChartBarIcon className={iconClasses} />,
-    name: "Analytics",
-  },
-  {
-    path: "/app/integration",
-    icon: <BoltIcon className={iconClasses} />,
-    name: "Integration",
-  },
+  // {
+  //   path: "/app/leads",
+  //   icon: <UsersIcon className={iconClasses} />,
+  //   name: "Leads",
+  // },
+  // {
+  //   path: "/app/transactions",
+  //   icon: <CurrencyDollarIcon className={iconClasses} />,
+  //   name: "Transactions",
+  // },
+  // {
+  //   path: "/app/charts",
+  //   icon: <ChartBarIcon className={iconClasses} />,
+  //   name: "Analytics",
+  // },
+  // {
+  //   path: "/app/integration",
+  //   icon: <BoltIcon className={iconClasses} />,
+  //   name: "Integration",
+  // },
   {
     path: "/app/calendar",
     icon: <CalendarDaysIcon className={iconClasses} />,
     name: "Calendar",
   },
-  {
-    path: "",
-    icon: <DocumentDuplicateIcon className={`${iconClasses} inline`} />,
-    name: "Pages",
-    submenu: [
-      {
-        path: "/login",
-        icon: <ArrowRightOnRectangleIcon className={submenuIconClasses} />,
-        name: "Login",
-      },
-      {
-        path: "/register",
-        icon: <UserIcon className={submenuIconClasses} />,
-        name: "Register",
-      },
-      {
-        path: "/forgot-password",
-        icon: <KeyIcon className={submenuIconClasses} />,
-        name: "Forgot Password",
-      },
-      {
-        path: "/app/blank",
-        icon: <DocumentIcon className={submenuIconClasses} />,
-        name: "Blank Page",
-      },
-      {
-        path: "/app/404",
-        icon: <ExclamationTriangleIcon className={submenuIconClasses} />,
-        name: "404",
-      },
-    ],
-  },
-  {
-    path: "",
-    icon: <Cog6ToothIcon className={`${iconClasses} inline`} />,
-    name: "Settings",
-    submenu: [
-      {
-        path: "/app/settings-profile",
-        icon: <UserIcon className={submenuIconClasses} />,
-        name: "Profile",
-      },
-      {
-        path: "/app/settings-billing",
-        icon: <WalletIcon className={submenuIconClasses} />,
-        name: "Billing",
-      },
-      {
-        path: "/app/settings-team",
-        icon: <UsersIcon className={submenuIconClasses} />,
-        name: "Team Members",
-      },
-    ],
-  },
-  {
-    path: "",
-    icon: <DocumentTextIcon className={`${iconClasses} inline`} />,
-    name: "Documentation",
-    submenu: [
-      {
-        path: "/app/getting-started",
-        icon: <DocumentTextIcon className={submenuIconClasses} />,
-        name: "Getting Started",
-      },
-      {
-        path: "/app/features",
-        icon: <TableCellsIcon className={submenuIconClasses} />,
-        name: "Features",
-      },
-      {
-        path: "/app/components",
-        icon: <CodeBracketSquareIcon className={submenuIconClasses} />,
-        name: "Components",
-      },
-    ],
-  },
+  // {
+  //   path: "",
+  //   icon: <DocumentDuplicateIcon className={`${iconClasses} inline`} />,
+  //   name: "Pages",
+  //   submenu: [
+  //     {
+  //       path: "/login",
+  //       icon: <ArrowRightOnRectangleIcon className={submenuIconClasses} />,
+  //       name: "Login",
+  //     },
+  //     {
+  //       path: "/register",
+  //       icon: <UserIcon className={submenuIconClasses} />,
+  //       name: "Register",
+  //     },
+  //     {
+  //       path: "/forgot-password",
+  //       icon: <KeyIcon className={submenuIconClasses} />,
+  //       name: "Forgot Password",
+  //     },
+  //     {
+  //       path: "/app/blank",
+  //       icon: <DocumentIcon className={submenuIconClasses} />,
+  //       name: "Blank Page",
+  //     },
+  //     {
+  //       path: "/app/404",
+  //       icon: <ExclamationTriangleIcon className={submenuIconClasses} />,
+  //       name: "404",
+  //     },
+  //   ],
+  // },
+  // {
+  //   path: "",
+  //   icon: <Cog6ToothIcon className={`${iconClasses} inline`} />,
+  //   name: "Settings",
+  //   submenu: [
+  //     {
+  //       path: "/app/settings-profile",
+  //       icon: <UserIcon className={submenuIconClasses} />,
+  //       name: "Profile",
+  //     },
+  //     {
+  //       path: "/app/settings-billing",
+  //       icon: <WalletIcon className={submenuIconClasses} />,
+  //       name: "Billing",
+  //     },
+  //     {
+  //       path: "/app/settings-team",
+  //       icon: <UsersIcon className={submenuIconClasses} />,
+  //       name: "Team Members",
+  //     },
+  //   ],
+  // },
+  // {
+  //   path: "",
+  //   icon: <DocumentTextIcon className={`${iconClasses} inline`} />,
+  //   name: "Documentation",
+  //   submenu: [
+  //     {
+  //       path: "/app/getting-started",
+  //       icon: <DocumentTextIcon className={submenuIconClasses} />,
+  //       name: "Getting Started",
+  //     },
+  //     {
+  //       path: "/app/features",
+  //       icon: <TableCellsIcon className={submenuIconClasses} />,
+  //       name: "Features",
+  //     },
+  //     {
+  //       path: "/app/components",
+  //       icon: <CodeBracketSquareIcon className={submenuIconClasses} />,
+  //       name: "Components",
+  //     },
+  //   ],
+  // },
 ];
 
 export default routes;

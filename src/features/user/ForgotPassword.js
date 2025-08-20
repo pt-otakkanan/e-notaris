@@ -83,7 +83,8 @@ function ForgotPassword() {
             {!linkSent && (
               <>
                 <p className="text-center mt-4 mb-6 text-black">
-                  Kami akan mengirimkan tautan reset kata sandi ke email Anda.
+                  Kami akan mengirimkan tautan reset kata sandi <br></br> ke
+                  email Anda.
                 </p>
                 <form onSubmit={(e) => submitForm(e)}>
                   <div className="mb-4">

@@ -1,6 +1,6 @@
 import moment from "moment";
-import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import TitleCard from "../../components/Cards/TitleCard";
 import { openModal } from "../common/modalSlice";
@@ -14,7 +14,7 @@ import CalendarIcon from "@heroicons/react/24/outline/CalendarIcon";
 import {
   getNotarisActivitiesContent,
   deleteNotarisActivity,
-} from "./notarisActivitiesSlice";
+} from "../notarisactivitiesclient/notarisActivitiesSlice";
 
 function NotarisActivities() {
   const { items = [], isLoading = false } = useSelector(
@@ -40,41 +40,19 @@ function NotarisActivities() {
     );
   };
 
-  const openAddModal = () => {
+  // Buka modal detail jadwal
+  const openScheduleDetail = (row) => {
     dispatch(
       openModal({
-        title: "Tambah Aktivitas Notaris",
-        bodyType: MODAL_BODY_TYPES.NOTARIS_ACTIVITY_ADD,
-        size: "lg",
-      })
-    );
-  };
-
-  // Edit activity
-  const openEdit = (row) => {
-    dispatch(
-      openModal({
-        title: "Edit Aktivitas Notaris",
-        bodyType: MODAL_BODY_TYPES.NOTARIS_ACTIVITY_EDIT,
-        extraObject: row,
-        size: "lg",
-      })
-    );
-  };
-
-  // Buka modal penjadwalan
-  const openScheduleModal = (row) => {
-    dispatch(
-      openModal({
-        title: "Penjadwalan Aktivitas",
-        bodyType: MODAL_BODY_TYPES.NOTARIS_ACTIVITY_SCHEDULE,
+        title: "Detail Penjadwalan",
+        bodyType: MODAL_BODY_TYPES.NOTARIS_ACTIVITY_SCHEDULE_DETAIL,
         extraObject: {
           activity: row,
-          existingSchedule: row.scheduled_date || null,
-          onSubmit: (scheduleData) => {
-            // Handle submit penjadwalan
-            console.log("Schedule data:", scheduleData);
-            // Di sini Anda bisa dispatch action untuk update jadwal
+          schedule: {
+            scheduledDate: row.scheduled_date,
+            location: row.schedule_location,
+            notes: row.schedule_notes,
+            status: row.schedule_status || "confirmed",
           },
         },
         size: "lg",
@@ -82,15 +60,28 @@ function NotarisActivities() {
     );
   };
 
-  // Hapus activity
-  const askDelete = (index) => {
+  const approveVerification = (row) => {
     dispatch(
       openModal({
         title: "Konfirmasi",
         bodyType: MODAL_BODY_TYPES.CONFIRMATION,
         extraObject: {
-          message: "Yakin ingin menghapus aktivitas ini?",
-          type: CONFIRMATION_MODAL_CLOSE_TYPES.LEAD_DELETE,
+          message: `Yakin ingin menyetujui aktivitas ini`,
+          type: "IDV_APPROVE",
+          row,
+        },
+      })
+    );
+  };
+
+  const rejectVerification = (index) => {
+    dispatch(
+      openModal({
+        title: "Konfirmasi",
+        bodyType: MODAL_BODY_TYPES.CONFIRMATION,
+        extraObject: {
+          message: `Yakin ingin menolak aktivitas ini?`,
+          type: "IDV_REJECT",
           index,
         },
       })
@@ -107,25 +98,31 @@ function NotarisActivities() {
         Menunggu:
           "inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 inset-ring inset-ring-red-600/10",
       }[status] || "badge-ghost";
-    return <div className={`badge ${cls}`}>{status || "Tidak diketahui"}</div>;
+    // ⬇️ cegah wrap di badge juga
+    return (
+      <div className={`badge ${cls} whitespace-nowrap`}>
+        {status || "Tidak diketahui"}
+      </div>
+    );
   };
 
-  const renderScheduleButton = (row) => {
+  const renderScheduleInfo = (row) => {
     const hasSchedule = row.scheduled_date;
 
     if (hasSchedule) {
       return (
         <div className="flex flex-col items-center gap-1">
           <button
-            className="btn btn-sm btn-outline btn-success"
-            onClick={() => openScheduleModal(row)}
+            className="link link-primary text-sm flex items-center gap-1"
+            onClick={() => openScheduleDetail(row)}
           >
-            Terjadwal
+            <CalendarIcon className="w-4 h-4" />
+            Lihat
           </button>
-          <div className="text-xs text-gray-600">
-            {moment(row.scheduled_date).format("DD MMM YYYY")}
+          <div className="text-xs text-gray-600 whitespace-nowrap">
+            {moment(row.scheduled_date).format("DD MMM")}
           </div>
-          <div className="text-xs text-gray-600">
+          <div className="text-xs text-gray-600 whitespace-nowrap">
             {moment(row.scheduled_date).format("HH:mm")}
           </div>
         </div>
@@ -133,12 +130,10 @@ function NotarisActivities() {
     }
 
     return (
-      <button
-        className="btn btn-sm btn-outline btn-primary"
-        onClick={() => openScheduleModal(row)}
-      >
-        Jadwalkan
-      </button>
+      <div className="text-center text-gray-400 text-sm">
+        <CalendarIcon className="w-4 h-4 mx-auto mb-1 opacity-50" />
+        <div className="whitespace-nowrap">Belum dijadwalkan</div>
+      </div>
     );
   };
 
@@ -181,16 +176,6 @@ function NotarisActivities() {
           <MagnifyingGlassIcon className="w-4 h-4" />
         </button>
       </div>
-      <div>
-        <div className="inline-block float-right">
-          <button
-            className="btn px-6 btn-sm normal-case btn-primary"
-            onClick={() => openAddModal()}
-          >
-            Tambah
-          </button>
-        </div>
-      </div>
       {query ? (
         <button className="btn btn-sm btn-ghost" onClick={() => setQuery("")}>
           Reset
@@ -202,7 +187,7 @@ function NotarisActivities() {
   if (isLoading) {
     return (
       <TitleCard
-        title="Aktivitas Notaris"
+        title="Aktivitas Notaris - Penghadap"
         topMargin="mt-2"
         TopSideButtons={TopSideButtons}
       >
@@ -213,7 +198,7 @@ function NotarisActivities() {
 
   return (
     <TitleCard
-      title="Aktivitas Notaris"
+      title="Aktivitas Notaris - Penghadap"
       topMargin="mt-2"
       TopSideButtons={TopSideButtons}
     >
@@ -229,10 +214,11 @@ function NotarisActivities() {
           )}
         </div>
       ) : (
+        // ⬇️ biarkan container bisa scroll horizontal
         <div className="overflow-x-auto w-full">
           <table className="table w-full [&_th]:whitespace-nowrap [&_td]:whitespace-nowrap">
             <thead>
-              <tr>
+              <tr className="text-center">
                 <th>Kode</th>
                 <th>Jenis Akta</th>
                 <th>Penghadap 1</th>
@@ -254,7 +240,7 @@ function NotarisActivities() {
                   <td>
                     <Link
                       to="/app/document-requirement"
-                      className="link link-primary"
+                      className="link link-primary inline-block"
                       rel="noreferrer"
                     >
                       Lihat
@@ -263,32 +249,33 @@ function NotarisActivities() {
                   <td>
                     <a
                       href={row.draft_akta}
-                      className="link link-primary"
+                      className="link link-primary inline-block"
+                      target="_blank"
                       rel="noreferrer"
                     >
                       Lihat
                     </a>
                   </td>
-                  <td className="text-center">{renderScheduleButton(row)}</td>
+                  <td className="text-center">{renderScheduleInfo(row)}</td>
                   <td>{renderStatusBadge(row.status)}</td>
-                  <td className="flex">
+                  <td className="flex flex-nowrap items-center gap-2">
                     <button
-                      className="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1.5 text-center me-2 mb-2 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-800"
+                      className="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1.5 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-800"
                       onClick={() => openDetail(row)}
                     >
                       Detail
                     </button>
                     <button
-                      className="text-yellow-700 hover:text-white border border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-3 py-1.5 text-center me-2 mb-2 dark:border-yellow-500 dark:text-yellow-500 dark:hover:text-white dark:hover:bg-yellow-600 dark:focus:ring-yellow-800"
-                      onClick={() => openEdit(row)}
+                      className="text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-3 py-1.5 text-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800"
+                      onClick={() => approveVerification(row)}
                     >
-                      Edit
+                      Setujui
                     </button>
                     <button
-                      className="text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-1.5 text-center me-2 mb-2 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-800"
-                      onClick={() => askDelete(k)}
+                      className="text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-1.5 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-800"
+                      onClick={() => rejectVerification(k)}
                     >
-                      Hapus
+                      Tolak
                     </button>
                   </td>
                 </tr>
