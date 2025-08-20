@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import LandingIntro from "./LandingIntro";
+import ErrorText from "../../components/Typography/ErrorText";
+import { color } from "chart.js/helpers";
+import InputTextAuth from "../../components/Input/InputTextAuth";
+
 
 function Login() {
   const INITIAL_LOGIN_OBJ = {

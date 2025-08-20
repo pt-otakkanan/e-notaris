@@ -14,24 +14,29 @@ function LeftSidebar() {
   };
 
   return (
-    <div className="drawer-side  z-30">
+    <div className="drawer-side z-30">
       <label htmlFor="left-sidebar-drawer" className="drawer-overlay"></label>
-      <ul className="menu  pt-2 w-80 bg-base-100 min-h-full   text-base-content">
+      <ul className="menu pt-2 w-80 bg-base-200 min-h-full text-base-content">
         <button
-          className="btn btn-ghost bg-base-300  btn-circle z-50 top-0 right-0 mt-4 mr-2 absolute lg:hidden"
+          className="btn btn-ghost bg-base-200 btn-circle z-50 top-0 right-0 mt-4 mr-2 absolute lg:hidden"
           onClick={() => close()}
         >
           <XMarkIcon className="h-5 inline-block w-5" />
         </button>
 
         <li className="mb-2 font-semibold text-xl">
-          <Link to={"/app/welcome"}>
+          <Link to={"/app/dashboard"}>
             <img
-              className="mask mask-squircle w-10"
-              src="/logo192.png"
-              alt="DashWind Logo"
+              className="mask mask-squircle w-10 dark:hidden"
+              src="/logo-light.png"
+              alt="Logo E-Notaris Light"
             />
-            DashWind
+            <img
+              className="mask mask-squircle w-10 hidden dark:block"
+              src="/logo-dark.png"
+              alt="Logo E-Notaris Dark"
+            />
+            E-Notaris
           </Link>{" "}
         </li>
         {routes.map((route, k) => {
@@ -45,14 +50,16 @@ function LeftSidebar() {
                   to={route.path}
                   className={({ isActive }) =>
                     `${
-                      isActive ? "font-semibold  bg-base-200 " : "font-normal"
+                      isActive
+                        ? "font-semibold  bg-[#ccb0b2] dark:bg-[#3b3b3b]"
+                        : "font-normal"
                     }`
                   }
                 >
                   {route.icon} {route.name}
                   {location.pathname === route.path ? (
                     <span
-                      className="absolute inset-y-0 left-0 w-1 rounded-tr-md rounded-br-md bg-primary "
+                      className="absolute inset-y-0 left-0 w-1 rounded-tr-md rounded-br-md bg-[#96696d] dark:bg-[#92bbcc] "
                       aria-hidden="true"
                     ></span>
                   ) : null}
