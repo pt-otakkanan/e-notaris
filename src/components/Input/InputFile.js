@@ -78,7 +78,7 @@ function FileInput({
 
       {/* Area kosong (belum ada file) */}
       {!file ? (
-        <div className="border-2 border-dashed border-base-300 rounded-lg p-6 text-center hover:border-primary transition-colors">
+        <div className="border-2 border-dashed border-base-300 rounded-lg p-6 text-center hover:border-[#96696d] dark:hover:border-[#92bbcc] transition-colors">
           <input
             ref={inputRef}
             type="file"

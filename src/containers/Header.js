@@ -104,7 +104,7 @@ function Header() {
             <div className="indicator">
               <BellIcon className="h-6 w-6" />
               {noOfNotifications > 0 ? (
-                <span className="indicator-item badge badge-secondary badge-sm">
+                <span className="indicator-item badge bg-[#ccb0b2] dark:bg-[#92bbcc] dark:text-black badge-sm">
                   {noOfNotifications}
                 </span>
               ) : null}
@@ -114,8 +114,8 @@ function Header() {
           {/* Profile icon, opening menu on click */}
           <div className="dropdown dropdown-end ml-4">
             <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
-              <div className="w-10 rounded-full">
-                <img src="https://placeimg.com/80/80/people" alt="profile" />
+              <div className="w-7 rounded-full">
+                <img src="/profile.png" alt="profile" />
               </div>
             </label>
             <ul
@@ -123,10 +123,7 @@ function Header() {
               className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
             >
               <li className="justify-between">
-                <Link to={"/app/settings-profile"}>
-                  Profile Settings
-                  <span className="badge">New</span>
-                </Link>
+                <Link to={"/app/settings-profile"}>Profile Settings</Link>
               </li>
               <li className="">
                 <Link to={"/app/settings-billing"}>Bill History</Link>
