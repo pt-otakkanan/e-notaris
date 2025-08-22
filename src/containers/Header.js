@@ -114,8 +114,19 @@ function Header() {
           {/* Profile icon, opening menu on click */}
           <div className="dropdown dropdown-end ml-4">
             <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
-              <div className="w-7 rounded-full">
-                <img src="/profile.png" alt="profile" />
+              <div className="w-9 rounded-full">
+                {/* Gambar default untuk light mode */}
+                <img
+                  src="/profile-black.png"
+                  alt="profile"
+                  className="block dark:hidden"
+                />
+                {/* Gambar khusus untuk dark mode */}
+                <img
+                  src="/profile-white.png"
+                  alt="profile"
+                  className="hidden dark:block"
+                />
               </div>
             </label>
             <ul
