@@ -7,11 +7,12 @@ import MoonIcon from "@heroicons/react/24/outline/MoonIcon";
 import SunIcon from "@heroicons/react/24/outline/SunIcon";
 import { openRightDrawer } from "../features/common/rightDrawerSlice";
 import { RIGHT_DRAWER_TYPES } from "../utils/globalConstantUtil";
-
-import { NavLink, Routes, Link, useLocation } from "react-router-dom";
+import AuthService from "../services/auth.service";
+import { Link, useNavigate } from "react-router-dom";
 
 function Header() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { noOfNotifications, pageTitle } = useSelector((state) => state.header);
   const [currentTheme, setCurrentTheme] = useState(
     localStorage.getItem("theme")
@@ -42,9 +43,17 @@ function Header() {
     );
   };
 
-  function logoutUser() {
-    localStorage.clear();
-    window.location.href = "/";
+  async function logoutUser(e) {
+    e?.preventDefault();
+    const lastEmail = localStorage.getItem("user_email") || "";
+    await AuthService.logout(); // revoke token di server + bersihkan storage
+    navigate("/login", {
+      replace: true,
+      state: {
+        email: lastEmail,
+        flash: { type: "success", message: "Anda berhasil logout." },
+      },
+    });
   }
 
   return (
@@ -141,7 +150,10 @@ function Header() {
               </li>
               <div className="divider mt-0 mb-0"></div>
               <li>
-                <a onClick={logoutUser}>Logout</a>
+                {/* gunakan button agar tidak ikut behavior <a> */}
+                <button type="button" onClick={logoutUser}>
+                  Logout
+                </button>
               </li>
             </ul>
           </div>

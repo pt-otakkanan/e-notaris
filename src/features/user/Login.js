@@ -1,76 +1,154 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import LandingIntro from "./LandingIntro";
-import ErrorText from "../../components/Typography/ErrorText";
-import { color } from "chart.js/helpers";
 import InputTextAuth from "../../components/Input/InputTextAuth";
+import AuthService from "../../services/auth.service";
 
-function Login() {
-  const INITIAL_LOGIN_OBJ = {
-    password: "",
-    emailId: "",
-  };
+export default function Login() {
+  const navigate = useNavigate();
+  const location = useLocation();
 
+  const INITIAL_LOGIN_OBJ = { emailId: "", password: "" };
+
+  const [loginObj, setLoginObj] = useState(INITIAL_LOGIN_OBJ);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [loginObj, setLoginObj] = useState(INITIAL_LOGIN_OBJ);
+  const [flash, setFlash] = useState({ type: "", message: "" });
 
-  // auto-hide error setelah 4 detik
+  // Prefill email & flash message dari navigate state (mis. dari Verify/RequireAuth)
   useEffect(() => {
-    if (!errorMessage) return;
-    const timer = setTimeout(() => setErrorMessage(""), 4000);
-    return () => clearTimeout(timer);
-  }, [errorMessage]);
-
-  const submitForm = (e) => {
-    e.preventDefault();
-    setErrorMessage("");
-
-    if (loginObj.emailId.trim() === "")
-      return setErrorMessage("Email wajib diisi!");
-    if (loginObj.password.trim() === "")
-      return setErrorMessage("Kata sandi wajib diisi!");
-    else {
-      setLoading(true);
-      // TODO: Panggil API login
-      localStorage.setItem("token", "DumyTokenHere");
-      setLoading(false);
-      window.location.href = "/app/welcome";
+    const emailFromState = location?.state?.email;
+    if (emailFromState) {
+      setLoginObj((s) => ({ ...s, emailId: emailFromState }));
     }
-  };
+    const incomingFlash = location?.state?.flash;
+    if (incomingFlash?.message) setFlash(incomingFlash);
+
+    // bersihkan state agar tidak muncul lagi saat back/forward
+    // (opsional) navigate(".", { replace: true });
+    // eslint-disable-next-line
+  }, []);
+
+  // Auto-hide error & flash
+  useEffect(() => {
+    if (!errorMessage && !flash.message) return;
+    const t = setTimeout(() => {
+      setErrorMessage("");
+      setFlash({ type: "", message: "" });
+    }, 4000);
+    return () => clearTimeout(t);
+  }, [errorMessage, flash]);
 
   const updateFormValue = ({ updateType, value }) => {
     setErrorMessage("");
-    setLoginObj({ ...loginObj, [updateType]: value });
+    setFlash({ type: "", message: "" });
+    setLoginObj((s) => ({ ...s, [updateType]: value }));
+  };
+
+  const submitForm = async (e) => {
+    e.preventDefault();
+    setErrorMessage("");
+    setFlash({ type: "", message: "" });
+
+    if (!loginObj.emailId.trim()) return setErrorMessage("Email wajib diisi!");
+    if (!loginObj.password.trim())
+      return setErrorMessage("Kata sandi wajib diisi!");
+
+    try {
+      setLoading(true);
+
+      await AuthService.login({
+        email: loginObj.emailId,
+        password: loginObj.password,
+      });
+
+      // Berhasil login → balik ke tujuan awal atau /app/welcome
+      const fallback = "/app/welcome";
+      const from = location.state?.from?.pathname || fallback;
+      navigate(from, { replace: true });
+    } catch (err) {
+      const status = err?.response?.status;
+      const msg =
+        err?.response?.data?.message ||
+        "Gagal masuk. Silakan periksa email dan kata sandi Anda.";
+
+      if (status === 422) {
+        const errs = err?.response?.data?.data;
+        if (errs && typeof errs === "object") {
+          const firstKey = Object.keys(errs)[0];
+          const firstMsg = Array.isArray(errs[firstKey])
+            ? errs[firstKey][0]
+            : String(errs[firstKey] || msg);
+          setErrorMessage(firstMsg);
+        } else {
+          setErrorMessage(msg);
+        }
+        return;
+      }
+
+      if (status === 403) {
+        // Belum verifikasi → lempar ke VerifyCode dengan email
+        navigate("/verify-code", {
+          replace: true,
+          state: { email: loginObj.emailId, from: "login" },
+        });
+        return;
+      }
+
+      setErrorMessage(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div
-      className={`min-h-screen flex items-center`}
+      className="min-h-screen flex items-center"
       style={{ backgroundColor: "#ccb0b2" }}
     >
       <div className="card mx-auto w-full max-w-5xl shadow-xl rounded-none md:rounded-xl overflow-hidden">
         <div
-          className={`grid md:grid-cols-2 grid-cols-1`}
+          className="grid md:grid-cols-2 grid-cols-1"
           style={{
             background: "linear-gradient(180deg, #ffffff 0%, #ccb0b2 100%)",
           }}
         >
-          {/* Kolom kiri */}
           <div className="rounded-xl" style={{ backgroundColor: "#96696d" }}>
             <LandingIntro />
           </div>
 
-          {/* Kolom kanan scrollable */}
-          <div className="py-24 px-10 max-h-[80vh] overflow-y-auto">
+          <div className="py-24 px-10 max-h-[87vh] overflow-y-auto">
             <h2 className="text-3xl font-bold mb-1 text-center text-black">
               Selamat datang kembali!
             </h2>
-            <div className="text-center mt-4 mb-4 text-black">
+            <div className="text-center mt-4 mb-6 text-black">
               Masukkan detail Anda.
             </div>
 
-            {/* Alert error */}
+            {/* FLASH (success/warning) */}
+            {flash.message && (
+              <div className="mb-6 relative">
+                <div
+                  className={`px-4 py-3 rounded text-sm text-center relative border ${
+                    flash.type === "success"
+                      ? "bg-green-100 border-green-400 text-green-700"
+                      : "bg-yellow-100 border-yellow-400 text-yellow-800"
+                  }`}
+                >
+                  {flash.message}
+                  <button
+                    type="button"
+                    className="absolute right-2 top-1 font-bold"
+                    onClick={() => setFlash({ type: "", message: "" })}
+                    aria-label="Tutup"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ERROR */}
             {errorMessage && (
               <div className="mb-6 relative">
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded text-sm text-center relative">
@@ -79,6 +157,7 @@ function Login() {
                     type="button"
                     className="absolute right-2 top-1 text-red-700 font-bold"
                     onClick={() => setErrorMessage("")}
+                    aria-label="Tutup"
                   >
                     ✕
                   </button>
@@ -110,9 +189,9 @@ function Login() {
                 />
               </div>
 
-              <div className="text-right text-primary">
+              <div className="text-right">
                 <Link to="/forgot-password">
-                  <span className="text-sm mb-0 inline-block hover:text-primary hover:underline hover:cursor-pointer transition duration-200">
+                  <span className="text-sm inline-block hover:underline hover:cursor-pointer transition duration-200 text-black">
                     Lupa kata sandi?
                   </span>
                 </Link>
@@ -122,8 +201,7 @@ function Login() {
                 <button
                   type="submit"
                   className={
-                    "btn w-60 text-white text-lg rounded-full border-gray-300 p-2 w-72" +
-                    (loading ? " loading" : "")
+                    "btn w-72 text-white text-lg rounded-full border-gray-300 p-2"
                   }
                   style={{
                     backgroundColor: "#474747",
@@ -137,7 +215,7 @@ function Login() {
                 <div className="text-center mt-4 text-black">
                   Belum punya akun?{" "}
                   <Link to="/register">
-                    <span className="text-black inline-block hover:text-primary hover:underline hover:cursor-pointer transition duration-200">
+                    <span className="inline-block hover:underline hover:cursor-pointer transition duration-200 text-black">
                       Daftar
                     </span>
                   </Link>
@@ -151,5 +229,3 @@ function Login() {
     </div>
   );
 }
-
-export default Login;

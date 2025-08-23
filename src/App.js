@@ -1,4 +1,4 @@
-import React, { lazy, useEffect } from "react";
+import React, { lazy, Suspense, useEffect } from "react";
 import "./App.css";
 import {
   BrowserRouter as Router,
@@ -7,10 +7,9 @@ import {
   Navigate,
 } from "react-router-dom";
 import { themeChange } from "theme-change";
-import checkAuth from "./app/auth";
 import initializeApp from "./app/init";
+import RequireAuth from "./app/requireAuth";
 
-// Importing pages
 const Layout = lazy(() => import("./containers/Layout"));
 const Login = lazy(() => import("./pages/Login"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
@@ -18,40 +17,43 @@ const Register = lazy(() => import("./pages/Register"));
 const VerifyCode = lazy(() => import("./pages/VerifyCode"));
 const Documentation = lazy(() => import("./pages/Documentation"));
 
-// Initializing different libraries
 initializeApp();
-
-// Check for login and initialize axios
-const token = checkAuth();
 
 function App() {
   useEffect(() => {
-    // 👆 daisy UI themes initialization
     themeChange(false);
   }, []);
 
   return (
-    <>
-      <Router>
+    <Router>
+      <Suspense fallback={<div className="p-8">Loading...</div>}>
         <Routes>
+          {/* Public routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/register" element={<Register />} />
           <Route path="/verify-code" element={<VerifyCode />} />
           <Route path="/documentation" element={<Documentation />} />
 
-          {/* Place new routes over this */}
-          <Route path="/app/*" element={<Layout />} />
+          {/* Protected routes */}
+          <Route element={<RequireAuth />}>
+            <Route path="/app/*" element={<Layout />} />
+          </Route>
 
+          {/* Fallback: arahkan sesuai token */}
           <Route
             path="*"
             element={
-              <Navigate to={token ? "/app/welcome" : "/login"} replace />
+              localStorage.getItem("token") ? (
+                <Navigate to="/app/welcome" replace />
+              ) : (
+                <Navigate to="/login" replace />
+              )
             }
           />
         </Routes>
-      </Router>
-    </>
+      </Suspense>
+    </Router>
   );
 }
 
