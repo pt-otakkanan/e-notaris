@@ -32,6 +32,13 @@ function Register() {
     e.preventDefault();
     setErrorMessage("");
 
+    const emptyCount = Object.values(registerObj).filter(
+      (value) => !value || value.toString().trim() === ""
+    ).length;
+
+    if (emptyCount >= 2) {
+      return setErrorMessage("Semua field wajib diisi.");
+    }
     if (registerObj.name.trim() === "")
       return setErrorMessage("Nama Lengkap wajib diisi.");
     if (registerObj.emailId.trim() === "")
@@ -132,11 +139,11 @@ function Register() {
                 />
 
                 {/* Konfirmasi Kata Sandi */}
-                <InputText
+                <InputTextAuth
                   defaultValue={registerObj.confirmPassword}
                   type="password"
                   updateType="confirmPassword"
-                  containerStyle="mt-4"
+                  containerStyle="mt-4 text-black"
                   labelTitle="Konfirmasi Kata Sandi"
                   updateFormValue={updateFormValue}
                 />
@@ -145,7 +152,7 @@ function Register() {
                 <CheckCardGroup
                   labelTitle=""
                   labelDescription="Pilih peran Anda dalam sistem"
-                  containerStyle="mt-4"
+                  containerStyle="mt-6 text-black"
                   options={[
                     {
                       name: "Notaris",
@@ -170,7 +177,7 @@ function Register() {
                 <button
                   type="submit"
                   className={
-                    "btn mt-1 w-60 border-r-0 text-white text-lg rounded-full border-gray-300 p-2 w-72 placeholder-gray-500" +
+                    "btn mt-1 w-60 mt-6 border-r-0 text-white text-lg rounded-full border-gray-300 p-2 w-72 placeholder-gray-500" +
                     (loading ? " loading" : "")
                   }
                   style={{

@@ -43,7 +43,6 @@ function Users() {
         bodyType: MODAL_BODY_TYPES.CONFIRMATION,
         extraObject: {
           message: `Yakin ingin menghapus pengguna ini?`,
-          // kalau kamu sudah punya USER_DELETE di constants, boleh ganti ini
           type: CONFIRMATION_MODAL_CLOSE_TYPES.LEAD_DELETE,
           index,
         },
