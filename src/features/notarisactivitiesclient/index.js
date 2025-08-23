@@ -98,7 +98,6 @@ function NotarisActivities() {
         Menunggu:
           "inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 inset-ring inset-ring-red-600/10",
       }[status] || "badge-ghost";
-    // ⬇️ cegah wrap di badge juga
     return (
       <div className={`badge ${cls} whitespace-nowrap`}>
         {status || "Tidak diketahui"}
@@ -214,7 +213,6 @@ function NotarisActivities() {
           )}
         </div>
       ) : (
-        // ⬇️ biarkan container bisa scroll horizontal
         <div className="overflow-x-auto w-full">
           <table className="table w-full [&_th]:whitespace-nowrap [&_td]:whitespace-nowrap">
             <thead>

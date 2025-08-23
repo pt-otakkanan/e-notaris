@@ -5,7 +5,6 @@ import ErrorText from "../../components/Typography/ErrorText";
 import { color } from "chart.js/helpers";
 import InputTextAuth from "../../components/Input/InputTextAuth";
 
-
 function Login() {
   const INITIAL_LOGIN_OBJ = {
     password: "",
@@ -87,43 +86,28 @@ function Login() {
               </div>
             )}
 
-            <form onSubmit={(e) => submitForm(e)}>
+            <form onSubmit={submitForm}>
               <div className="mb-4">
-                <div className="form-control mt-4">
-                  <label className="label">
-                    <span className="label-text">Email</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={loginObj.emailId}
-                    onChange={(e) =>
-                      updateFormValue({
-                        updateType: "emailId",
-                        value: e.target.value,
-                      })
-                    }
-                    className="input input-bordered w-full"
-                    placeholder="Masukkan email"
-                  />
-                </div>
+                <InputTextAuth
+                  defaultValue={loginObj.emailId}
+                  updateType="emailId"
+                  containerStyle="mt-4"
+                  labelTitle="Email"
+                  updateFormValue={updateFormValue}
+                  className="input input-bordered w-full"
+                  placeholder="Masukkan email"
+                />
 
-                <div className="form-control mt-4">
-                  <label className="label">
-                    <span className="label-text">Kata Sandi</span>
-                  </label>
-                  <input
-                    type="password"
-                    value={loginObj.password}
-                    onChange={(e) =>
-                      updateFormValue({
-                        updateType: "password",
-                        value: e.target.value,
-                      })
-                    }
-                    className="input input-bordered w-full"
-                    placeholder="Masukkan kata sandi"
-                  />
-                </div>
+                <InputTextAuth
+                  defaultValue={loginObj.password}
+                  type="password"
+                  updateType="password"
+                  containerStyle="mt-4"
+                  labelTitle="Kata Sandi"
+                  updateFormValue={updateFormValue}
+                  className="input input-bordered w-full"
+                  placeholder="Masukkan kata sandi"
+                />
               </div>
 
               <div className="text-right text-primary">

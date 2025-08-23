@@ -68,8 +68,8 @@ function CheckCardGroup({
                 "text-left rounded-xl border p-4 cursor-pointer transition",
                 "focus:outline-none focus:ring-2",
                 active
-                  ? "border-neutral/60 bg-base-200 ring-2 ring-neutral"
-                  : "border-base-300 hover:border-base-200",
+                  ? "border-white bg-[#96696d] ring-1 ring-[#efe0e1] text-white"
+                  : "text-black border-white hover:border-base-200",
               ].join(" ")}
               aria-pressed={active}
             >

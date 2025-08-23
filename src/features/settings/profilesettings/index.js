@@ -46,7 +46,7 @@ function ProfileSettings() {
           <div
             className={`tab tab-bordered transition-all duration-200 cursor-pointer ${
               activeTab === "profile"
-                ? "tab-active bg-primary text-primary-content"
+                ? "tab-active text-white bg-[#96696d] dark:bg-[#92bbcc] dark:text-primary-content"
                 : "bg-base-200 hover:bg-base-300 text-base-content"
             }`}
             onClick={() => setActiveTab("profile")}
@@ -56,7 +56,7 @@ function ProfileSettings() {
           <div
             className={`tab tab-bordered transition-all duration-200 cursor-pointer ${
               activeTab === "verifikasi"
-                ? "tab-active bg-primary text-primary-content"
+                ? "tab-active text-white bg-[#96696d] dark:bg-[#92bbcc] dark:text-primary-content"
                 : "bg-base-200 hover:bg-base-300 text-base-content"
             }`}
             onClick={() => setActiveTab("verifikasi")}

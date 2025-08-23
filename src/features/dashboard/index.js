@@ -6,39 +6,37 @@ import UserGroupIcon from "@heroicons/react/24/outline/UserGroupIcon";
 import UsersIcon from "@heroicons/react/24/outline/UsersIcon";
 import CircleStackIcon from "@heroicons/react/24/outline/CircleStackIcon";
 import CreditCardIcon from "@heroicons/react/24/outline/CreditCardIcon";
-import UserChannels from "./components/UserChannels";
-import LineChart from "./components/LineChart";
-import BarChart from "./components/BarChart";
 import DashboardTopBar from "./components/DashboardTopBar";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../common/headerSlice";
-import DoughnutChart from "./components/DoughnutChart";
 import { useState } from "react";
+import PendingActivity from "./components/PendingActivity";
+import RecentActivity from "./components/RecentActivity";
 
 const statsData = [
   {
-    title: "New Users",
+    title: "Total Notaris",
     value: "34.7k",
-    icon: <UserGroupIcon className="w-8 h-8" />,
+    icon: <UserGroupIcon className="w-8 h-8 text-[#96696d]" />,
     description: "↗︎ 2300 (22%)",
   },
   {
-    title: "Total Sales",
-    value: "$34,545",
-    icon: <CreditCardIcon className="w-8 h-8" />,
+    title: "Total Penghadap",
+    value: "34,545",
+    icon: <UserGroupIcon className="w-8 h-8 text-[#96696d]" />,
     description: "Current month",
   },
   {
-    title: "Pending Leads",
+    title: "Total Akta",
     value: "450",
-    icon: <CircleStackIcon className="w-8 h-8" />,
+    icon: <CircleStackIcon className="w-8 h-8 text-[#96696d]" />,
     description: "50 in hot leads",
   },
   {
-    title: "Active Users",
+    title: "Total Aktivitas Notaris",
     value: "5.6k",
-    icon: <UsersIcon className="w-8 h-8" />,
-    description: "↙ 300 (18%)",
+    icon: <UsersIcon className="w-8 h-8 text-[#96696d]" />,
+    description: "↗︎ 300 (18%)",
   },
 ];
 
@@ -67,24 +65,16 @@ function Dashboard() {
         })}
       </div>
 
-      {/** ---------------------- Different charts ------------------------- */}
-      <div className="grid lg:grid-cols-2 mt-4 grid-cols-1 gap-6">
-        <LineChart />
-        <BarChart />
-      </div>
+      {/** ---------------------- Different stats content ------------------------- */}
 
-      {/** ---------------------- Different stats content 2 ------------------------- */}
-
-      <div className="grid lg:grid-cols-2 mt-10 grid-cols-1 gap-6">
+      <div className="grid mt-5 grid-cols-1">
         <AmountStats />
-        <PageStats />
       </div>
 
       {/** ---------------------- User source channels table  ------------------------- */}
 
-      <div className="grid lg:grid-cols-2 mt-4 grid-cols-1 gap-6">
-        <UserChannels />
-        <DoughnutChart />
+      <div className="grid mt-0 grid-cols-1 gap-6">
+        <RecentActivity />
       </div>
     </>
   );
