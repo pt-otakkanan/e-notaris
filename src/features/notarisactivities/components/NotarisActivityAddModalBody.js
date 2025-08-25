@@ -1,40 +1,44 @@
-import { useMemo, useState } from "react";
-import InputSelect from "../../../components/Input/InputSelect";
-import TextAreaInput from "../../../components/Input/TextAreaInput";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+  useMemo as useMemo2,
+} from "react";
+import { useDispatch } from "react-redux";
+import SelectBoxSearch from "../../../components/Input/SelectBoxSearch";
+import { showNotification } from "../../../features/common/headerSlice";
+import NotarisActivityService from "../../../services/notarisActivity.service";
+import DeedService from "../../../services/deed.service";
 
 export default function NotarisActivityAddModalBody({
   extraObject = {},
   closeModal,
 }) {
-  const {
-    jenisAkta,
-    penghadap1Id,
-    penghadap2Id,
-    jenisAktaOptions = [
-      { value: "akta-jual-beli", label: "Akta Jual Beli" },
-      { value: "akta-hibah", label: "Akta Hibah" },
-      { value: "akta-perjanjian", label: "Akta Perjanjian" },
-      { value: "akta-pendirian", label: "Akta Pendirian" },
-    ],
-    peopleOptions = [
-      { value: "1", label: "Budi Santoso" },
-      { value: "2", label: "Siti Aisyah" },
-      { value: "3", label: "Andi Wijaya" },
-      { value: "4", label: "Dewi Putri" },
-    ],
-    onSubmit,
-  } = extraObject || {};
+  const dispatch = useDispatch();
+  const { onCreated } = extraObject || {};
 
-  const [form, setForm] = useState({
-    jenisAkta: jenisAkta || "",
-    penghadap1Id: penghadap1Id || "",
-    penghadap2Id: penghadap2Id || "",
-  });
+  // ====== state ======
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  // Deeds
+  const [deedOptions, setDeedOptions] = useState([]);
+  const [needSecondClient, setNeedSecondClient] = useState(false);
+
+  // Clients (penghadap)
+  const [clientOptions, setClientOptions] = useState([]);
+
+  // Form
+  const [form, setForm] = useState({
+    deedId: "",
+    penghadap1Id: "",
+    penghadap2Id: "",
+  });
 
   const updateFormValue = ({ updateType, value }) => {
     setForm((prev) => {
-      // kalau user ganti penghadap1 dan kebetulan sama dgn penghadap2 → reset penghadap2
+      // jika P1 berubah dan sama dengan P2 → reset P2
       if (
         updateType === "penghadap1Id" &&
         String(value) === String(prev.penghadap2Id)
@@ -45,64 +49,214 @@ export default function NotarisActivityAddModalBody({
     });
   };
 
-  // opsi Penghadap 2 tidak boleh sama dg Penghadap 1
-  const peopleP2Options = useMemo(
+  // opsi P2 tidak boleh sama dg P1
+  const p2Options = useMemo(
     () =>
-      peopleOptions.filter(
-        (p) => String(p.value) !== String(form.penghadap1Id)
+      clientOptions.filter(
+        (o) => String(o.value) !== String(form.penghadap1Id)
       ),
-    [peopleOptions, form.penghadap1Id]
+    [clientOptions, form.penghadap1Id]
   );
 
-  const handleSave = () => {
-    if (!form.jenisAkta || !form.penghadap1Id || !form.penghadap2Id) {
-      setError("Semua field wajib diisi.");
+  // ====== load deeds on mount ======
+  useEffect(() => {
+    (async () => {
+      try {
+        // ambil banyak sekalian (ubah jika perlu)
+        const res = await DeedService.list({
+          page: 1,
+          per_page: 100,
+          search: "",
+        });
+        const arr = Array.isArray(res?.data) ? res.data : [];
+        setDeedOptions(arr.map((d) => ({ value: d.id, label: d.name })));
+      } catch {
+        dispatch(
+          showNotification({ message: "Gagal memuat daftar akta.", status: 0 })
+        );
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ====== load clients pertama kali ======
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await NotarisActivityService.listClients({ search: "" });
+        setClientOptions(Array.isArray(res?.data) ? res.data : []);
+      } catch {
+        dispatch(
+          showNotification({ message: "Gagal memuat penghadap.", status: 0 })
+        );
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ====== saat deed dipilih → cek is_double_client ======
+  useEffect(() => {
+    (async () => {
+      if (!form.deedId) {
+        setNeedSecondClient(false);
+        return;
+      }
+      try {
+        const res = await DeedService.detail(form.deedId);
+        const needTwo = !!res?.data?.is_double_client;
+        setNeedSecondClient(needTwo);
+        if (!needTwo) {
+          setForm((p) => ({ ...p, penghadap2Id: "" }));
+        }
+      } catch {
+        setNeedSecondClient(false);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.deedId]);
+
+  const fetchClients = useCallback(async (term = "") => {
+    try {
+      const res = await NotarisActivityService.listClients({ search: term });
+      setClientOptions(Array.isArray(res?.data) ? res.data : []);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  // 2) a debounced wrapper so we don't hammer the API while typing
+  const searchClients = useMemo2(() => {
+    let tid;
+    return (term = "") => {
+      clearTimeout(tid);
+      tid = setTimeout(() => fetchClients(term), 300);
+    };
+  }, [fetchClients]);
+
+  useEffect(() => {
+    if (form.penghadap1Id && needSecondClient) {
+      // kosongkan pilihan P2 & tarik ulang kandidat
+      setForm((p) => ({ ...p, penghadap2Id: "" }));
+      fetchClients(""); // initial list untuk dropdown P2
+    }
+  }, [form.penghadap1Id, needSecondClient, fetchClients]);
+
+  // ====== validate + submit ======
+  const validate = () => {
+    if (!form.deedId) return "Jenis akta wajib dipilih.";
+    if (!form.penghadap1Id) return "Penghadap 1 wajib dipilih.";
+    if (needSecondClient && !form.penghadap2Id)
+      return "Akta ini memerlukan Penghadap 2.";
+    if (
+      form.penghadap1Id &&
+      form.penghadap2Id &&
+      String(form.penghadap1Id) === String(form.penghadap2Id)
+    )
+      return "Penghadap 1 dan Penghadap 2 tidak boleh sama.";
+    return null;
+  };
+
+  const handleSave = async () => {
+    const v = validate();
+    if (v) {
+      setError(v);
       return;
     }
     setError("");
-    if (typeof onSubmit === "function") onSubmit(form);
-    closeModal();
+
+    try {
+      setSaving(true);
+      const payload = {
+        deed_id: Number(form.deedId),
+        first_client_id: Number(form.penghadap1Id),
+        ...(needSecondClient && form.penghadap2Id
+          ? { second_client_id: Number(form.penghadap2Id) }
+          : {}),
+      };
+
+      await NotarisActivityService.create(payload);
+
+      dispatch(
+        showNotification({ message: "Aktivitas berhasil dibuat", status: 1 })
+      );
+      if (typeof onCreated === "function") onCreated();
+      closeModal();
+    } catch (err) {
+      const status = err?.response?.status;
+      let msg =
+        err?.response?.data?.message || "Gagal membuat aktivitas notaris.";
+      const errors = err?.response?.data?.data || err?.response?.data?.errors;
+      if (status === 422 && errors && typeof errors === "object") {
+        const firstKey = Object.keys(errors)[0];
+        const firstMsg = Array.isArray(errors[firstKey])
+          ? errors[firstKey][0]
+          : String(errors[firstKey]);
+        if (firstMsg) msg = firstMsg;
+      }
+      dispatch(showNotification({ message: msg, status: 0 }));
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
     <div className="space-y-5">
-      <InputSelect
-        labelTitle="Jenis Akta"
-        required
-        options={jenisAktaOptions}
-        defaultValue={form.jenisAkta}
-        updateType="jenisAkta"
-        updateFormValue={updateFormValue}
+      {/* Jenis Akta */}
+      <SelectBoxSearch
+        labelTitle={
+          <>
+            Jenis Akta <span className="text-red-500">*</span>
+          </>
+        }
         placeholder="Pilih jenis akta…"
+        value={form.deedId}
+        updateType="deedId"
+        updateFormValue={updateFormValue}
+        options={deedOptions} // [{value,label}]
       />
 
-      <InputSelect
-        labelTitle="Penghadap 1"
-        required
-        options={peopleOptions}
-        defaultValue={form.penghadap1Id}
+      {/* Penghadap 1 */}
+      <SelectBoxSearch
+        labelTitle={
+          <>
+            Penghadap 1 <span className="text-red-500">*</span>
+          </>
+        }
+        placeholder="Pilih penghadap 1…"
+        value={form.penghadap1Id}
         updateType="penghadap1Id"
         updateFormValue={updateFormValue}
-        placeholder="Pilih penghadap 1…"
+        options={clientOptions}
+        searchable
+        onSearch={searchClients}
       />
 
-      <InputSelect
-        labelTitle="Penghadap 2"
-        required
-        options={peopleP2Options}
-        defaultValue={form.penghadap2Id}
+      {/* Penghadap 2 */}
+      <SelectBoxSearch
+        key={`${needSecondClient}-${form.penghadap1Id}`}
+        labelTitle={
+          needSecondClient ? (
+            <>
+              Penghadap 2 <span className="text-red-500">*</span>
+            </>
+          ) : (
+            "Penghadap 2 (opsional)"
+          )
+        }
+        placeholder={
+          form.penghadap1Id
+            ? needSecondClient
+              ? "Pilih penghadap 2…"
+              : "Tidak diperlukan"
+            : "Pilih Penghadap 1 dulu"
+        }
+        value={form.penghadap2Id}
         updateType="penghadap2Id"
         updateFormValue={updateFormValue}
-        placeholder={
-          form.penghadap1Id ? "Pilih penghadap 2…" : "Pilih Penghadap 1 dulu"
-        }
-        disabled={!form.penghadap1Id}
-      />
-
-      <TextAreaInput
-        labelTitle="Deskripsi"
-        defaultValue=""
-        updateFormValue=""
+        options={p2Options}
+        disabled={!form.penghadap1Id || !needSecondClient}
+        searchable
+        onSearch={searchClients}
       />
 
       {error ? (
@@ -110,10 +264,14 @@ export default function NotarisActivityAddModalBody({
       ) : null}
 
       <div className="flex justify-end gap-2 pt-2">
-        <button className="btn" onClick={closeModal}>
+        <button className="btn" onClick={closeModal} disabled={saving}>
           Tutup
         </button>
-        <button className="btn btn-primary" onClick={handleSave}>
+        <button
+          className={`btn btn-primary ${saving ? "loading" : ""}`}
+          onClick={handleSave}
+          disabled={saving}
+        >
           Simpan
         </button>
       </div>

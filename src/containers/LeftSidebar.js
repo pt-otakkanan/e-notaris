@@ -16,7 +16,7 @@ function LeftSidebar() {
   return (
     <div className="drawer-side z-30">
       <label htmlFor="left-sidebar-drawer" className="drawer-overlay"></label>
-      <ul className="menu pt-2 w-80 bg-base-200 min-h-full text-base-content">
+      <ul className="menu pt-2 w-80 bg-[#fcfcfc] min-h-full text-base-content">
         <button
           className="btn btn-ghost bg-base-200 btn-circle z-50 top-0 right-0 mt-4 mr-2 absolute lg:hidden"
           onClick={() => close()}

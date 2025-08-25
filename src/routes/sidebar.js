@@ -37,7 +37,7 @@ const routes = [
   {
     path: "/app/deeds",
     icon: <DocumentTextIcon className={iconClasses} />,
-    name: "Data Otentik",
+    name: "Akta Otentik",
   },
   {
     path: "/app/users",

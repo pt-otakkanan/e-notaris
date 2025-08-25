@@ -13,6 +13,7 @@ import DeedAddRequirementModalBody from "../features/deeds/components/DeedAddReq
 import DeedAddModalBody from "../features/deeds/components/DeedAddModalBody";
 import NotarisActivityAddModalBody from "../features/notarisactivities/components/NotarisActivityAddModalBody";
 import NotarisActivityEditModalBody from "../features/notarisactivities/components/NotarisActivityEditModalBody";
+import UserDeleteModalBody from "../features/users/components/UserDeleteModalBody";
 
 function ModalLayout() {
   const { isOpen, bodyType, size, extraObject, title } = useSelector(
@@ -90,6 +91,13 @@ function ModalLayout() {
 
               [MODAL_BODY_TYPES.USER_DETAIL]: (
                 <UserDetailModalBody
+                  extraObject={extraObject}
+                  closeModal={close}
+                />
+              ),
+
+              [MODAL_BODY_TYPES.USER_DELETE]: (
+                <UserDeleteModalBody
                   extraObject={extraObject}
                   closeModal={close}
                 />

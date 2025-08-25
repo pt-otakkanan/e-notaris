@@ -1,41 +1,52 @@
+// src/features/deed/index.jsx
 import moment from "moment";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import TitleCard from "../../components/Cards/TitleCard";
-import { setPageTitle } from "../common/headerSlice";
+import { setPageTitle, showNotification } from "../common/headerSlice";
 import MagnifyingGlassIcon from "@heroicons/react/24/outline/MagnifyingGlassIcon";
 import { openModal } from "../common/modalSlice";
 import { MODAL_BODY_TYPES } from "../../utils/globalConstantUtil";
-import { getDeedsContent, deleteDeed } from "./deedSlice";
+import { fetchDeeds, deleteDeedById, setLastQuery } from "./deedSlice";
 
 function Deeds() {
-  const { items = [], isLoading = false } = useSelector((s) => s.deed || {});
   const dispatch = useDispatch();
-  const [query, setQuery] = useState("");
+
+  const {
+    items = [],
+    isLoading = false,
+    meta,
+    lastQuery,
+  } = useSelector((s) => s.deed || {});
+
+  const [query, setQuery] = useState(lastQuery.search || "");
 
   useEffect(() => {
-    dispatch(setPageTitle("Daftar Akta (Deeds)"));
-    dispatch(getDeedsContent());
-  }, [dispatch]);
+    dispatch(setPageTitle("Akta Otentik"));
+    dispatch(fetchDeeds(lastQuery));
+    // eslint-disable-next-line
+  }, []);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return items;
-    return items.filter((d) => {
-      const extras = (d.dokumen_tambahan || []).map((x) => x.name).join(" ");
-      return [d.nama, d.deskripsi, String(d.jumlah_penghadap), extras]
-        .join(" ")
-        .toLowerCase()
-        .includes(q);
-    });
-  }, [items, query]);
+  const onSearch = () => {
+    const q = { ...lastQuery, page: 1, search: query };
+    dispatch(setLastQuery(q));
+    dispatch(fetchDeeds(q));
+  };
+
+  const changePage = (page) => {
+    if (!meta) return;
+    const p = Math.max(1, Math.min(page, meta.last_page || 1));
+    const q = { ...lastQuery, page: p };
+    dispatch(setLastQuery(q));
+    dispatch(fetchDeeds(q));
+  };
 
   const openDetail = (row) => {
     dispatch(
       openModal({
         title: "Detail Akta",
         bodyType: MODAL_BODY_TYPES.DEED_DETAIL,
-        extraObject: row,
+        extraObject: row, // atau id row.id kalau modal mau fetch sendiri
         size: "lg",
       })
     );
@@ -44,8 +55,8 @@ function Deeds() {
   const openAddModal = () => {
     dispatch(
       openModal({
-        title: "Add New Lead",
-        bodyType: MODAL_BODY_TYPES.DEED_ADD,
+        title: "Tambah Akta",
+        bodyType: MODAL_BODY_TYPES.DEED_ADD, // (opsional) kalau kamu sudah punya modal add/edit
       })
     );
   };
@@ -53,63 +64,61 @@ function Deeds() {
   const addRequirement = (row) => {
     dispatch(
       openModal({
-        title: "Tambah Dokumen Tambahan",
+        title: "Tambah Data Tambahan",
         bodyType: MODAL_BODY_TYPES.DEED_ADD_REQUIREMENT,
-        extraObject: row,
+        extraObject: row, // minimal butuh row.id
         size: "md",
       })
     );
   };
 
-  const askDelete = (index) => {
+  const askDelete = (row) => {
     dispatch(
       openModal({
         title: "Konfirmasi",
         bodyType: MODAL_BODY_TYPES.CONFIRMATION,
         extraObject: {
-          message: "Yakin ingin menghapus akta ini?",
+          message: `Yakin ingin menghapus akta "${row.nama}"?`,
+          // ⬇️ warning merah di bawah pesan utama
+          warning:
+            "Semua yang berhubungan dengan akta otentik ini akan dihapus.",
           type: "DEED_DELETE",
-          index,
-          onConfirm: () => dispatch(deleteDeed({ index })),
+          onConfirm: async () => {
+            await dispatch(deleteDeedById(row.id));
+            dispatch(
+              showNotification({ message: "Akta berhasil dihapus", status: 1 })
+            );
+          },
         },
       })
     );
   };
 
-  // Top-right search
   const TopSideButtons = (
     <div className="flex items-center gap-2">
       <div className="join">
         <input
           type="text"
           className="input input-sm input-bordered join-item w-[300px]"
-          placeholder="Cari nama, deskripsi, dokumen tambahan…"
+          placeholder="Cari nama atau deskripsi…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && onSearch()}
         />
-        <button className="btn btn-sm join-item" type="button">
+        <button
+          className="btn btn-sm join-item"
+          onClick={onSearch}
+          type="button"
+        >
           <MagnifyingGlassIcon className="w-4 h-4" />
         </button>
       </div>
-      <div>
-        <div className="inline-block float-right">
-          <button
-            className="btn px-6 btn-sm normal-case btn-primary"
-            onClick={() => openAddModal()}
-          >
-            Tambah
-          </button>
-        </div>
-      </div>
-      {query ? (
-        <button
-          className="btn btn-sm btn-ghost"
-          onClick={() => setQuery("")}
-          type="button"
-        >
-          Reset
-        </button>
-      ) : null}
+      <button
+        className="btn btn-sm bg-[#96696d] text-white"
+        onClick={openAddModal}
+      >
+        Tambah
+      </button>
     </div>
   );
 
@@ -120,7 +129,9 @@ function Deeds() {
         topMargin="mt-2"
         TopSideButtons={TopSideButtons}
       >
-        <div className="p-6 text-center">Memuat data…</div>
+        <div className="p-10 flex flex-col items-center justify-center gap-3">
+          <div className="text-sm opacity-70">Memuat data…</div>
+        </div>
       </TitleCard>
     );
   }
@@ -131,74 +142,120 @@ function Deeds() {
       topMargin="mt-2"
       TopSideButtons={TopSideButtons}
     >
-      {filtered.length === 0 ? (
-        <div className="p-6 text-center opacity-70">
-          {query ? (
-            <>
-              Tidak ada hasil untuk "<b>{query}</b>"
-            </>
-          ) : (
-            "Belum ada data akta."
-          )}
-        </div>
+      {items.length === 0 ? (
+        <div className="p-6 text-center opacity-70">Tidak ada data.</div>
       ) : (
-        <div className="overflow-x-auto w-full">
-          <table className="table w-full [&_th]:whitespace-nowrap [&_td]:whitespace-nowrap">
-            <thead>
-              <tr>
-                <th className="whitespace-nowrap">Nama</th>
-                <th className="whitespace-nowrap">Deskripsi</th>
-                <th className="whitespace-nowrap">Jumlah Penghadap</th>
-                <th className="whitespace-nowrap">Dokumen Tambahan</th>
-                <th className="whitespace-nowrap">Dibuat</th>
-                <th className="whitespace-nowrap">Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((row, k) => (
-                <tr key={row.id ?? k}>
-                  <td className="font-medium">{row.nama}</td>
-                  <td className="max-w-[420px]">{row.deskripsi}</td>
-                  <td className="text-center">{row.jumlah_penghadap}</td>
-                  <td className="space-x-1 space-y-1">
-                    {(row.dokumen_tambahan || []).length === 0 ? (
-                      <span className="badge badge-ghost">-</span>
-                    ) : (
-                      (row.dokumen_tambahan || []).map((d, i) => (
-                        <span key={i} className="badge badge-outline">
-                          {d.name}
-                        </span>
-                      ))
-                    )}
-                  </td>
-                  <td className="whitespace-nowrap">
-                    {moment(row.created_at || new Date()).format("DD MMM YYYY")}
-                  </td>
-                  <td className="">
-                    <button
-                      className="text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-3 py-1.5 text-center me-2 mb-2 dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800"
-                      onClick={() => addRequirement(k)}
-                    >
-                      Tambah Dokumen
-                    </button>
-                    <button
-                      className="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1.5 text-center me-2 mb-2 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-800"
-                      onClick={() => openDetail(k)}
-                    >
-                      Detail
-                    </button>
-                    <button
-                      className="text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-1.5 text-center me-2 mb-2 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-800"
-                      onClick={() => askDelete(k)}
-                    >
-                      Hapus
-                    </button>
-                  </td>
+        <>
+          <div className="overflow-x-auto w-full">
+            <table className="table w-full [&_th]:whitespace-nowrap [&_td]:whitespace-nowrap">
+              <thead>
+                <tr>
+                  <th>Nama</th>
+                  <th>Deskripsi</th>
+                  <th>Jumlah Penghadap</th>
+                  <th>Data Tambahan</th>
+                  <th>Dibuat</th>
+                  <th>Aksi</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {items.map((row) => (
+                  <tr key={row.id}>
+                    <td className="font-medium">{row.nama}</td>
+                    <td className="max-w-[420px]">
+                      <span title={row.deskripsi || ""}>
+                        {row.deskripsi
+                          ? row.deskripsi.length > 50
+                            ? row.deskripsi.slice(0, 30) + "…"
+                            : row.deskripsi
+                          : "-"}
+                      </span>
+                    </td>
+                    <td className="text-center">{row.jumlah_penghadap}</td>
+                    <td className="space-x-1 space-y-1">
+                      {!row.dokumen_tambahan?.length ? (
+                        <span className="badge badge-ghost">-</span>
+                      ) : (
+                        <>
+                          {row.dokumen_tambahan.slice(0, 3).map((d, i) => (
+                            <span
+                              key={d.id ?? i}
+                              className="badge badge-outline"
+                            >
+                              {d.name}
+                            </span>
+                          ))}
+
+                          {row.dokumen_tambahan.length > 3 && (
+                            <span
+                              className="badge badge-ghost"
+                              title="Lihat selengkapnya di Detail"
+                            >
+                              +{row.dokumen_tambahan.length - 3} lagi
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </td>
+
+                    <td className="whitespace-nowrap">
+                      {moment(row.created_at || new Date()).format(
+                        "DD MMM YYYY"
+                      )}
+                    </td>
+                    <td>
+                      <button
+                        className="text-green-7 rounded-lg text-sm px-3 py-1.5 me-2 bg-green-800 text-white"
+                        onClick={() => addRequirement(row)}
+                      >
+                        Tambah Data
+                      </button>
+                      <button
+                        className="text-blue-7 rounded-lg text-sm px-3 py-1.5 me-2 bg-blue-800 text-white"
+                        onClick={() => openDetail(row)}
+                      >
+                        Detail
+                      </button>
+                      <button
+                        className="text-red-7 rounded-lg text-sm px-3 py-1.5 me-2 bg-red-800 text-white"
+                        onClick={() => askDelete(row)}
+                      >
+                        Hapus
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {meta ? (
+            <div className="flex items-center justify-between mt-4">
+              <div className="text-sm opacity-70">
+                Menampilkan {meta.from}–{meta.to} dari {meta.total}
+              </div>
+              <div className="join">
+                <button
+                  className="btn btn-sm join-item"
+                  onClick={() => changePage((meta.current_page || 1) - 1)}
+                  disabled={meta.current_page <= 1}
+                >
+                  «
+                </button>
+                <button className="btn btn-sm join-item">
+                  Hal {meta.current_page} / {meta.last_page}
+                </button>
+                <button
+                  className="btn btn-sm join-item"
+                  onClick={() => changePage((meta.current_page || 1) + 1)}
+                  disabled={meta.current_page >= meta.last_page}
+                >
+                  »
+                </button>
+              </div>
+            </div>
+          ) : null}
+        </>
       )}
     </TitleCard>
   );
