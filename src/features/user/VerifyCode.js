@@ -1,34 +1,44 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import LandingIntro from "./LandingIntro";
 import InputText from "../../components/Input/InputText";
+import AuthService from "../../services/auth.service";
 
-function VerifyCode() {
+export default function VerifyCode() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Ambil email dari state (prefer), fallback ke localStorage (opsional)
+  const emailFromState = location?.state?.email || "";
+  const [email, setEmail] = useState(
+    emailFromState || localStorage.getItem("pendingEmail") || ""
+  );
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [infoMessage, setInfoMessage] = useState("");
   const [counter, setCounter] = useState(60);
 
-  const email = localStorage.getItem("pendingEmail") || "";
-  const role = localStorage.getItem("role") || "";
-
-  // hitung mundur
+  // countdown resend
   useEffect(() => {
     if (counter <= 0) return;
     const t = setInterval(() => setCounter((s) => s - 1), 1000);
     return () => clearInterval(t);
   }, [counter]);
 
-  // auto-close alert setelah 4 detik
+  // auto-close alert
   useEffect(() => {
-    if (!errorMessage) return;
-    const timer = setTimeout(() => setErrorMessage(""), 4000);
+    if (!errorMessage && !infoMessage) return;
+    const timer = setTimeout(() => {
+      setErrorMessage("");
+      setInfoMessage("");
+    }, 4000);
     return () => clearTimeout(timer);
-  }, [errorMessage]);
+  }, [errorMessage, infoMessage]);
 
   const updateFormValue = ({ updateType, value }) => {
-    if (updateType === "code") setCode(value);
+    if (updateType === "code") setCode(value.toUpperCase());
+    if (updateType === "email") setEmail(value);
     setErrorMessage("");
     setInfoMessage("");
   };
@@ -38,49 +48,83 @@ function VerifyCode() {
     setErrorMessage("");
     setInfoMessage("");
 
-    const trimmed = code.trim();
-    if (trimmed === "") return setErrorMessage("Kode verifikasi wajib diisi.");
-    if (!/^\d{6}$/.test(trimmed))
-      return setErrorMessage("Kode harus 6 digit angka.");
+    if (!email.trim()) return setErrorMessage("Email wajib diisi.");
+    const trimmed = code.trim().toUpperCase();
+
+    // BE generate: 7 char alfanumerik uppercase
+    if (!/^[A-Z0-9]{7}$/.test(trimmed)) {
+      return setErrorMessage("Kode harus 7 karakter (huruf/angka).");
+    }
 
     try {
       setLoading(true);
-      await new Promise((r) => setTimeout(r, 700)); // simulasi API
-      setLoading(false);
-      setInfoMessage("Verifikasi berhasil. Mengarahkan...");
-      const target = role === "notaris" ? "/app/notaris/setup" : "/app/welcome";
-      window.location.href = target;
+      await AuthService.verifyEmail({ email, kode: trimmed });
+
+      // bersihkan penyimpanan sementara (opsional)
+      localStorage.removeItem("pendingEmail");
+
+      // Sukses → lempar ke login dengan flash success + prefill email
+      navigate("/login", {
+        replace: true,
+        state: {
+          email,
+          flash: {
+            type: "success",
+            message: "Email berhasil diverifikasi. Silakan login.",
+          },
+        },
+      });
     } catch (err) {
+      const status = err?.response?.status;
+      const msg = err?.response?.data?.message || "Verifikasi gagal.";
+
+      if (status === 400 && /kadaluarsa/i.test(msg)) {
+        setInfoMessage("Kode kadaluarsa. Kode baru telah dikirim ke email.");
+        setCounter(60);
+      } else {
+        setErrorMessage(msg);
+      }
+    } finally {
       setLoading(false);
-      setErrorMessage("Kode verifikasi tidak valid atau sudah kadaluarsa.");
     }
   };
 
   const resendCode = async () => {
     if (counter > 0) return;
+    if (!email.trim()) {
+      setErrorMessage("Isi email terlebih dahulu untuk kirim ulang kode.");
+      return;
+    }
     setErrorMessage("");
     setInfoMessage("");
+
     try {
-      await new Promise((r) => setTimeout(r, 500)); // simulasi API
-      setInfoMessage(
-        email
-          ? `Kode baru telah dikirim ke ${email}.`
-          : "Kode baru telah dikirim. Silakan cek email Anda."
-      );
+      await AuthService.resendCode({ email });
+      setInfoMessage(`Kode baru telah dikirim ke ${email}.`);
       setCounter(60);
     } catch (err) {
-      setErrorMessage("Gagal mengirim ulang kode. Coba lagi nanti.");
+      const status = err?.response?.status;
+      const msg = err?.response?.data?.message || "Gagal mengirim ulang kode.";
+      if (status === 429) {
+        setErrorMessage(msg); // throttle: “Tunggu xx detik...”
+      } else if (status === 404) {
+        setErrorMessage("Email tidak ditemukan.");
+      } else if (status === 400) {
+        setErrorMessage("Email sudah terverifikasi.");
+      } else {
+        setErrorMessage(msg);
+      }
     }
   };
 
   return (
     <div
-      className={`min-h-screen flex items-center`}
+      className="min-h-screen flex items-center"
       style={{ backgroundColor: "#ccb0b2" }}
     >
       <div className="card mx-auto w-full max-w-5xl shadow-xl rounded-none md:rounded-xl overflow-hidden">
         <div
-          className={`grid md:grid-cols-2 grid-cols-1`}
+          className="grid md:grid-cols-2 grid-cols-1"
           style={{
             background: "linear-gradient(180deg, #ffffff 0%, #ccb0b2 100%)",
           }}
@@ -101,7 +145,7 @@ function VerifyCode() {
                 : " yang kami kirim ke email Anda."}
             </div>
 
-            {/* ALERT ERROR */}
+            {/* ERROR */}
             {errorMessage && (
               <div className="mb-6 relative">
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded text-sm text-center relative">
@@ -117,7 +161,7 @@ function VerifyCode() {
               </div>
             )}
 
-            {/* ALERT INFO */}
+            {/* INFO */}
             {infoMessage && (
               <div className="mb-6 relative">
                 <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded text-sm text-center relative">
@@ -134,14 +178,28 @@ function VerifyCode() {
             )}
 
             <form onSubmit={submitForm}>
-              <div className="mb-4 mt-[100px]">
+              {/* Email (editable) */}
+              <div className="mb-2">
+                <InputText
+                  type="email"
+                  defaultValue={email}
+                  updateType="email"
+                  containerStyle="mt-4"
+                  labelTitle="Email"
+                  placeholder="Masukkan email yang didaftarkan"
+                  updateFormValue={updateFormValue}
+                />
+              </div>
+
+              {/* Kode verifikasi 7-char */}
+              <div className="mb-4 mt-4">
                 <InputText
                   type="text"
                   defaultValue={code}
                   updateType="code"
                   containerStyle="mt-4"
                   labelTitle="Kode Verifikasi"
-                  placeholder="Masukkan 6 digit kode"
+                  placeholder="Masukkan 7 karakter (huruf/angka)"
                   updateFormValue={updateFormValue}
                 />
               </div>
@@ -150,8 +208,7 @@ function VerifyCode() {
                 <button
                   type="submit"
                   className={
-                    "btn mt-1 w-60 border-r-0 text-white text-lg rounded-full border-gray-300 p-2 w-72 placeholder-gray-500" +
-                    (loading ? " loading" : "")
+                    "btn mt-1 w-60 border-r-0 text-white text-lg rounded-full border-gray-300 p-2 w-72"
                   }
                   style={{
                     backgroundColor: "#474747",
@@ -162,7 +219,7 @@ function VerifyCode() {
                   Verifikasi
                 </button>
 
-                {/* Kirim ulang link */}
+                {/* Resend */}
                 <div className="mt-4 text-sm text-black">
                   {counter > 0 ? (
                     <span className="opacity-60">Kirim ulang ({counter}s)</span>
@@ -179,7 +236,7 @@ function VerifyCode() {
                 <div className="text-center mt-4 text-black">
                   Sudah punya akun?{" "}
                   <Link to="/login">
-                    <span className="text-black inline-block hover:text-primary hover:underline hover:cursor-pointer transition duration-200">
+                    <span className="text-black inline-block hover:underline hover:cursor-pointer transition duration-200">
                       Masuk
                     </span>
                   </Link>
@@ -193,5 +250,3 @@ function VerifyCode() {
     </div>
   );
 }
-
-export default VerifyCode;

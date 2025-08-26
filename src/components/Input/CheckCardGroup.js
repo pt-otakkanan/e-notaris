@@ -68,8 +68,8 @@ function CheckCardGroup({
                 "text-left rounded-xl border p-4 cursor-pointer transition",
                 "focus:outline-none focus:ring-2",
                 active
-                  ? "border-white bg-[#96696d] ring-1 ring-[#efe0e1] text-white"
-                  : "text-black border-white hover:border-base-200",
+                  ? "border-white bg-[#0256c4] ring-1 ring-[#efe0e1] text-white"
+                  : "text-black border-black",
               ].join(" ")}
               aria-pressed={active}
             >
@@ -81,7 +81,7 @@ function CheckCardGroup({
                     <span
                       className={[
                         "inline-block w-2.5 h-2.5 rounded-full",
-                        active ? "bg-neutral" : "bg-base-300",
+                        active ? "bg-white" : "bg-base-300",
                       ].join(" ")}
                       aria-hidden
                     />

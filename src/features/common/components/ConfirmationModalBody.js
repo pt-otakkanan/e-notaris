@@ -1,52 +1,80 @@
-import React, { useState } from "react";
+// src/features/common/ConfirmationModalBody.jsx
+import React, { useState, useMemo } from "react";
 import { useDispatch } from "react-redux";
-import { CONFIRMATION_MODAL_CLOSE_TYPES } from "../../../utils/globalConstantUtil";
-import { deleteLead } from "../../leads/leadSlice";
-import { showNotification } from "../headerSlice";
 import TextAreaInput from "../../../components/Input/TextAreaInput";
+import { showNotification } from "../headerSlice";
+// (opsional) kalau masih dipakai untuk tipe lain:
+// import { CONFIRMATION_MODAL_CLOSE_TYPES } from "../../../utils/globalConstantUtil";
+// import { deleteLead } from "../../leads/leadSlice";
 
-function ConfirmationModalBody({ extraObject, closeModal }) {
+export default function ConfirmationModalBody({
+  extraObject = {},
+  closeModal,
+}) {
   const dispatch = useDispatch();
-  const { message, type, _id, index } = extraObject;
+
+  const {
+    message = "",
+    type = "", // "IDV_APPROVE" | "IDV_REJECT" | (opsional tipe lain)
+    onConfirm, // function(optional) - dipanggil saat klik "Kirim"
+    warning,
+  } = extraObject;
+
+  const needReason = useMemo(() => type === "IDV_REJECT", [type]);
 
   const [reason, setReason] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const updateFormValue = ({ updateType, value }) => {
-    if (updateType === "REASON") {
-      setReason(value);
-    }
+    if (updateType === "REASON") setReason(value);
   };
 
-  const proceedWithYes = async () => {
-    if (type === CONFIRMATION_MODAL_CLOSE_TYPES.LEAD_DELETE) {
-      dispatch(deleteLead({ index, reason }));
-      dispatch(showNotification({ message: "Lead Deleted!", status: 1 }));
-    }
-
-    if (type === "IDV_APPROVE") {
+  const handleSubmit = async () => {
+    // validasi alasan saat reject
+    if (needReason && !reason.trim()) {
       dispatch(
-        showNotification({ message: "Aktivitas disetujui!", status: 1 })
+        showNotification({ message: "Mohon isi alasan penolakan.", status: 0 })
       );
+      return;
     }
 
-    if (type === "IDV_REJECT") {
-      dispatch(
-        showNotification({
-          message: `Aktivitas Berhasil Ditolak!`,
-          status: 1,
-        })
-      );
-    }
+    try {
+      setSubmitting(true);
 
-    closeModal();
+      if (typeof onConfirm === "function") {
+        // untuk REJECT, kirimkan alasan ke onConfirm
+        await onConfirm(needReason ? reason.trim() : undefined);
+      } else {
+        // fallback jika tidak ada onConfirm
+        dispatch(
+          showNotification({
+            message: "Aksi tidak terhubung dengan handler.",
+            status: 0,
+          })
+        );
+        return;
+      }
+
+      closeModal();
+    } catch (e) {
+      const msg =
+        e?.response?.data?.message ||
+        e?.message ||
+        "Gagal memproses permintaan.";
+      dispatch(showNotification({ message: msg, status: 0 }));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <>
       <p className="text-xl mt-8 text-center">{message}</p>
+      {warning ? (
+        <p className="mt-3 text-sm text-error text-center">{warning}</p>
+      ) : null}
 
-      {/* hanya tampilkan textarea kalau REJECT */}
-      {type === "IDV_REJECT" && (
+      {needReason && (
         <TextAreaInput
           labelTitle="Alasan Penolakan"
           labelStyle="font-medium"
@@ -59,15 +87,18 @@ function ConfirmationModalBody({ extraObject, closeModal }) {
       )}
 
       <div className="modal-action mt-12">
-        <button className="btn btn-outline w-28" onClick={closeModal}>
+        <button
+          className="btn btn-outline w-28"
+          onClick={closeModal}
+          disabled={submitting}
+        >
           Batalkan
         </button>
 
         <button
-          className="btn hover:text-black text-white bg-[#96696d] w-36"
-          // hanya disable kalau reject tapi belum isi alasan
-          disabled={type === "IDV_REJECT" && !reason.trim()}
-          onClick={proceedWithYes}
+          className={`btn hover:text-black text-white bg-[#0256c4]  w-36`}
+          disabled={submitting || (needReason && !reason.trim())}
+          onClick={handleSubmit}
         >
           Kirim
         </button>
@@ -75,5 +106,3 @@ function ConfirmationModalBody({ extraObject, closeModal }) {
     </>
   );
 }
-
-export default ConfirmationModalBody;

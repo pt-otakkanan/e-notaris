@@ -1,88 +1,145 @@
+// src/features/deed/deedSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import DeedService from "../../services/deed.service";
+import RequirementService from "../../services/requirement.service";
 
-// utils
-const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
-const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-
-// dummy generator deeds
-const generateDummyDeeds = (count = 16) => {
-  const names = [
-    "Pendirian PT",
-    "Jual Beli",
-    "Perjanjian Sewa",
-    "Pendirian CV",
-  ];
-  const extrasPool = [
-    "NPWP",
-    "Anggaran Dasar",
-    "NIB",
-    "SIUP",
-    "KTP Direksi",
-    "TDP",
-  ];
-
-  return Array.from({ length: count }, (_, i) => {
-    const nama = pick(names);
-    const jumlah_penghadap = rand(1, 2);
-    const nExtras = rand(0, 2);
-    const dokumen_tambahan = Array.from({ length: nExtras }, (_, j) => {
-      const label = pick(extrasPool);
-      return {
-        name: label,
-        url: `https://files.example.com/deeds/${i + 1}/${label
-          .toLowerCase()
-          .replace(/\s+/g, "-")}.pdf`,
-      };
-    });
-    return {
-      id: i + 1,
-      nama,
-      deskripsi: `Dokumen ${nama} nomor ${1000 + i} dengan ketentuan singkat.`,
-      jumlah_penghadap,
-      dokumen_tambahan,
-      created_at: new Date(Date.now() - rand(0, 60) * 86400000).toISOString(),
-    };
-  });
+const initialState = {
+  isLoading: false,
+  items: [],
+  meta: null,
+  error: null,
+  lastQuery: { page: 1, per_page: 10, search: "" },
 };
 
-// thunk API (tetap ada); fallback ke dummy bila gagal
-export const getDeedsContent = createAsyncThunk("/deeds/content", async () => {
-  try {
-    const res = await axios.get("/api/deeds", {});
-    return res.data; // harapkan { data: [...] }
-  } catch (e) {
-    console.warn("API deeds gagal, pakai dummy:", e?.message);
-    return { data: generateDummyDeeds(16) };
+// LIST
+export const fetchDeeds = createAsyncThunk(
+  "deed/list",
+  async (query = {}, { rejectWithValue }) => {
+    try {
+      const data = await DeedService.list(query);
+      return { data, query };
+    } catch (e) {
+      return rejectWithValue(
+        e?.response?.data || { message: "Gagal mengambil data" }
+      );
+    }
   }
-});
+);
+
+// CREATE
+export const createDeed = createAsyncThunk(
+  "deed/create",
+  async (payload, { getState, dispatch, rejectWithValue }) => {
+    try {
+      const res = await DeedService.create(payload);
+      const { deed } = getState();
+      await dispatch(fetchDeeds(deed.lastQuery));
+      return res;
+    } catch (e) {
+      return rejectWithValue(
+        e?.response?.data || { message: "Gagal membuat akta" }
+      );
+    }
+  }
+);
+
+// UPDATE
+export const updateDeed = createAsyncThunk(
+  "deed/update",
+  async ({ id, ...payload }, { getState, dispatch, rejectWithValue }) => {
+    try {
+      const res = await DeedService.update(id, payload);
+      const { deed } = getState();
+      await dispatch(fetchDeeds(deed.lastQuery));
+      return res;
+    } catch (e) {
+      return rejectWithValue(
+        e?.response?.data || { message: "Gagal memperbarui akta" }
+      );
+    }
+  }
+);
+
+// DELETE
+export const deleteDeedById = createAsyncThunk(
+  "deed/delete",
+  async (id, { getState, dispatch, rejectWithValue }) => {
+    try {
+      const res = await DeedService.delete(id);
+      const { deed } = getState();
+      await dispatch(fetchDeeds(deed.lastQuery));
+      return res;
+    } catch (e) {
+      return rejectWithValue(
+        e?.response?.data || { message: "Gagal menghapus akta" }
+      );
+    }
+  }
+);
+
+// ADD REQUIREMENT
+export const addRequirementToDeed = createAsyncThunk(
+  "deed/addRequirement",
+  async (
+    { deed_id, name, is_file },
+    { getState, dispatch, rejectWithValue }
+  ) => {
+    try {
+      const res = await RequirementService.create({ deed_id, name, is_file });
+      const { deed } = getState();
+      await dispatch(fetchDeeds(deed.lastQuery));
+      return res;
+    } catch (e) {
+      return rejectWithValue(
+        e?.response?.data || { message: "Gagal menambah dokumen" }
+      );
+    }
+  }
+);
 
 const deedSlice = createSlice({
   name: "deed",
-  initialState: { isLoading: false, items: [] },
+  initialState,
   reducers: {
-    addNewDeed: (state, action) => {
-      const { newItem } = action.payload;
-      state.items = [...state.items, newItem];
-    },
-    deleteDeed: (state, action) => {
-      const { index } = action.payload;
-      state.items.splice(index, 1);
+    setLastQuery: (state, action) => {
+      state.lastQuery = { ...state.lastQuery, ...(action.payload || {}) };
     },
   },
-  extraReducers: {
-    [getDeedsContent.pending]: (state) => {
+  extraReducers: (builder) => {
+    builder.addCase(fetchDeeds.pending, (state, action) => {
       state.isLoading = true;
-    },
-    [getDeedsContent.fulfilled]: (state, action) => {
-      state.items = action.payload.data || [];
+      state.error = null;
+      if (action.meta?.arg)
+        state.lastQuery = { ...state.lastQuery, ...action.meta.arg };
+    });
+
+    builder.addCase(fetchDeeds.fulfilled, (state, action) => {
       state.isLoading = false;
-    },
-    [getDeedsContent.rejected]: (state) => {
+      const payload = action.payload?.data || {};
+      const arr = Array.isArray(payload.data) ? payload.data : payload;
+      const list = Array.isArray(arr) ? arr : [];
+
+      state.items = list.map((d) => ({
+        id: d.id,
+        nama: d.name,
+        deskripsi: d.description,
+        jumlah_penghadap: d.is_double_client ? 2 : 1,
+        dokumen_tambahan: (d.requirements || []).map((r) => ({
+          id: r.id,
+          name: r.name,
+          is_file: !!r.is_file,
+        })),
+        created_at: d.created_at,
+      }));
+      state.meta = payload.meta || null;
+    });
+
+    builder.addCase(fetchDeeds.rejected, (state, action) => {
       state.isLoading = false;
-    },
+      state.error = action.payload?.message || "Gagal memuat data";
+    });
   },
 });
 
-export const { addNewDeed, deleteDeed } = deedSlice.actions;
+export const { setLastQuery } = deedSlice.actions;
 export default deedSlice.reducer;

@@ -1,38 +1,40 @@
-import { color } from "chart.js/helpers";
-import { useState } from "react";
+import { useId } from "react";
 
 function InputText({
   labelTitle,
-  labelStyle,
-  type,
-  containerStyle,
-  defaultValue,
-  placeholder,
+  labelStyle = "",
+  type = "text",
+  containerStyle = "",
+  value = "", // <-- controlled
+  placeholder = "",
   updateFormValue,
   updateType,
-  disabled,
+  disabled = false,
+  isLoading = false,
+  className = "input input-bordered w-full",
 }) {
-  const [value, setValue] = useState(defaultValue);
-
-  const updateInputValue = (val) => {
-    setValue(val);
-    updateFormValue({ updateType, value: val });
-  };
+  const id = useId();
 
   return (
     <div className={`form-control w-full ${containerStyle}`}>
-      <label className="label">
-        <span className={"label-text text-base-content " + labelStyle}>
-          {labelTitle}
-        </span>
-      </label>
+      {labelTitle && (
+        <label className="label" htmlFor={id}>
+          <span className={`label-text text-base-content ${labelStyle}`}>
+            {labelTitle}
+          </span>
+        </label>
+      )}
+
       <input
-        type={type || "text"}
-        value={value}
-        placeholder={placeholder || ""}
-        onChange={(e) => updateInputValue(e.target.value)}
-        className="input input-bordered w-full"
-        disabled={disabled}
+        id={id}
+        type={type}
+        value={value ?? ""} // <-- pakai prop value, bukan state internal
+        placeholder={placeholder}
+        onChange={(e) =>
+          updateFormValue?.({ updateType, value: e.target.value })
+        }
+        className={className}
+        disabled={disabled || isLoading}
       />
     </div>
   );
