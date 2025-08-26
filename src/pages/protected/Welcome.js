@@ -13,7 +13,7 @@ function InternalPage() {
   }, []);
 
   return (
-    <div className="hero h-4/5 bg-white shadow rounded-2xl dark:bg-[#0e4356]">
+    <div className="hero h-4/5 bg-white shadow rounded-2xl dark:bg-[#0b0255]">
       {/* <image
         src="bg-texture.png"
         alt="Background Texture"
@@ -26,7 +26,7 @@ function InternalPage() {
       <LandingPoints />
       <div className="flex justify-center mt-44">
         <Link to="/app/dashboard">
-          <button className="btn bg-[#0256c4] dark:bg-[#92bbcc] dark:hover:bg-[#3b3b3b] dark:hover:text-[#efe0e1] text-[white] btn-outline rounded-full">
+          <button className="btn bg-[#0256c4] dark:bg-[#01043c] dark:hover:bg-[#3b3b3b] dark:hover:text-[#efe0e1] text-[white] btn-outline rounded-full">
             Mulai Sekarang
           </button>
         </Link>

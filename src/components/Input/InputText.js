@@ -11,7 +11,7 @@ function InputText({
   updateType,
   disabled = false,
   isLoading = false,
-  className = "input input-bordered w-full",
+  className = "input input-bordered w-full dark:bg-[#01043c]", // bg gelapnya input
 }) {
   const id = useId();
 

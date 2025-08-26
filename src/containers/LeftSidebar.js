@@ -16,7 +16,7 @@ function LeftSidebar() {
   return (
     <div className="drawer-side z-30">
       <label htmlFor="left-sidebar-drawer" className="drawer-overlay"></label>
-      <ul className="menu pt-2 w-[270px] bg-[#0256c4] min-h-full text-base-content">
+      <ul className="menu pt-2 w-[270px] bg-[#0256c4] dark:bg-[#0b0255] min-h-full text-base-content">
         <button
           className="btn btn-ghost bg-base-200 btn-circle z-50 top-0 right-0 mt-4 mr-2 absolute lg:hidden"
           onClick={() => close()}
@@ -24,8 +24,11 @@ function LeftSidebar() {
           <XMarkIcon className="h-5 inline-block w-5" />
         </button>
 
-        <li className="mb-5 font-semibold text-xl ">
-          <Link to={"/app/dashboard"}>
+        <li className="mb-5 font-semibold text-xl bg-transparent hover:bg-transparent">
+          <Link
+            to={"/app/dashboard"}
+            className="bg-transparent hover:bg-transparent"
+          >
             <img
               className="mask mask-squircle w-10 dark:hidden"
               src="/logo-light.png"
@@ -41,7 +44,7 @@ function LeftSidebar() {
         </li>
         {routes.map((route, k) => {
           return (
-            <li className="mb-3" key={k}>
+            <li className="mb-3 rounded-[10px] " key={k}>
               {route.submenu ? (
                 <SidebarSubmenu {...route} />
               ) : (
@@ -51,9 +54,9 @@ function LeftSidebar() {
                   className={({ isActive }) =>
                     `${
                       isActive
-                        ? "font-semibold bg-white text-[#0256c4] dark:bg-[#3b3b3b]"
-                        : "font-normal"
-                    } text-white`
+                        ? "font-normal text-[#002d6a] bg-[#f5fefd]"
+                        : "font-semibold text-white"
+                    } hover:text-[#0256c4]`
                   }
                 >
                   {route.icon} {route.name}

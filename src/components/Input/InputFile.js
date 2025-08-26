@@ -281,7 +281,8 @@ function FileInput({
 
       {/* 3) BELUM ADA FILE */}
       {!hasLocalFile && !hasRemoteUrl && (
-        <div className="border-2 border-dashed border-base-300 rounded-lg p-6 text-center hover:border-[#96696d] dark:hover:border-[#92bbcc] transition-colors">
+        // ini border up doc
+        <div className="border-2 border-dashed border-base-300 rounded-lg p-6 text-center hover:border-[#0256c4] dark:hover:border-[#7b9cc9] transition-colors">
           <input
             ref={inputRef}
             type="file"
