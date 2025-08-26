@@ -40,7 +40,7 @@ function SelectBox({
       </label>
 
       <select
-        className="select select-bordered w-full"
+        className="select select-bordered w-full dark:bg-[#01043c]"
         value={inner}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}

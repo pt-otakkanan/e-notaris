@@ -4,7 +4,8 @@ function TitleCard({ title, children, topMargin, TopSideButtons }) {
   return (
     <div
       className={
-        "card w-full p-6 bg-base-100 shadow-xl " + (topMargin || "mt-6")
+        "card w-full p-6 bg-base-100 dark:bg-[#0b0255] shadow-xl " +
+        (topMargin || "mt-6")
       }
     >
       {/* Title for Card */}
@@ -19,7 +20,9 @@ function TitleCard({ title, children, topMargin, TopSideButtons }) {
       <div className="divider mt-2"></div>
 
       {/** Card Body */}
-      <div className="h-full w-full pb-6 bg-base-100">{children}</div>
+      <div className="h-full w-full pb-6 bg-base-100 dark:bg-[#0b0255]">
+        {children}
+      </div>
     </div>
   );
 }

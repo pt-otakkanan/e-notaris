@@ -70,20 +70,22 @@ function RecentActivity() {
         <table className="table w-full ">
           <thead className="rounded-t-lg">
             <tr className="">
-              <th className="normal-case text-lg text-white bg-detail rounded-tl-md">
+              <th className="normal-case text-lg text-white dark:bg-[#01043c] dark:text-gray-300 bg-detail rounded-tl-md">
                 Nomor
               </th>
-              <th className="normal-case text-lg text-white bg-detail">Kode</th>
-              <th className="normal-case text-lg text-white bg-detail">
+              <th className="normal-case text-lg text-white dark:bg-[#01043c] dark:text-gray-300 bg-detail">
+                Kode
+              </th>
+              <th className="normal-case text-lg text-white dark:bg-[#01043c] dark:text-gray-300 bg-detail">
                 Jenis Akta
               </th>
-              <th className="normal-case text-lg text-white bg-detail">
+              <th className="normal-case text-lg text-white dark:bg-[#01043c] dark:text-gray-300 bg-detail">
                 Penghadap 1
               </th>
-              <th className="normal-case text-lg text-white bg-detail">
+              <th className="normal-case text-lg text-white dark:bg-[#01043c] dark:text-gray-300 bg-detail">
                 Penghadap 2
               </th>
-              <th className="normal-case text-lg text-white bg-detail rounded-tr-md">
+              <th className="normal-case text-lg text-white dark:bg-[#01043c] dark:text-gray-300 bg-detail rounded-tr-md">
                 Status
               </th>
             </tr>
@@ -111,7 +113,7 @@ function RecentActivity() {
         </table>
       </div>
       <div className="flex justify-end mt-5">
-        <button className="mt-5 btn bg-detail text-white w-full">
+        <button className="mt-5 btn bg-detail text-white dark:bg-[#01043c] dark:text-gray-300 w-full">
           Lihat Detail
         </button>
       </div>

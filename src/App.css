@@ -1,14 +1,32 @@
 /* Target hanya menu di sidebar kiri */
-.drawer-side .menu li > *:active,
+.drawer-side .menu li > *:active {
+  background-color: #f5fefd !important; /* warna klik light mode */
+  color: #002d6a !important; /* warna teks */
+}
+
 .drawer-side .menu li > *.active {
-  background-color: #96696d !important; /* warna klik light mode */
-  color: #000 !important; /* warna teks */
+  color: white !important;
+}
+
+.drawer-side .menu li > * {
+  font-weight: bold !important;
+}
+
+[data-theme="dark"].drawer-side .menu li > * {
+  color: #002d6a !important;
+  font-weight: bold !important;
+}
+
+/* hover state */
+.drawer-side .menu li > *:hover {
+  color: #002d6a !important;
+  background-color: white !important; /* ini bg onclick */
 }
 
 [data-theme="dark"] .drawer-side .menu li > *:active,
 [data-theme="dark"] .drawer-side .menu li > *.active {
-  background-color: red !important; /* warna klik dark mode */
-  color: #fff !important;
+  background-color: #002d6a !important; /* warna klik dark mode */
+  color: white !important;
 }
 
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap");
