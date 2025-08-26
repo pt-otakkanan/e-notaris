@@ -7,6 +7,7 @@ import {
 } from "react";
 import { useDispatch } from "react-redux";
 import SelectBoxSearch from "../../../components/Input/SelectBoxSearch";
+import InputTextAuth from "../../../components/Input/InputTextAuth"; // Import component InputTextAuth
 import { showNotification } from "../../../features/common/headerSlice";
 import NotarisActivityService from "../../../services/notarisActivity.service";
 import DeedService from "../../../services/deed.service";
@@ -31,6 +32,7 @@ export default function NotarisActivityAddModalBody({
 
   // Form
   const [form, setForm] = useState({
+    name: "", // Tambah kolom name
     deedId: "",
     penghadap1Id: "",
     penghadap2Id: "",
@@ -143,6 +145,7 @@ export default function NotarisActivityAddModalBody({
 
   // ====== validate + submit ======
   const validate = () => {
+    if (!form.name?.trim()) return "Nama aktivitas wajib diisi."; // Validasi name
     if (!form.deedId) return "Jenis akta wajib dipilih.";
     if (!form.penghadap1Id) return "Penghadap 1 wajib dipilih.";
     if (needSecondClient && !form.penghadap2Id)
@@ -167,6 +170,7 @@ export default function NotarisActivityAddModalBody({
     try {
       setSaving(true);
       const payload = {
+        name: form.name.trim(), // Tambah name ke payload
         deed_id: Number(form.deedId),
         first_client_id: Number(form.penghadap1Id),
         ...(needSecondClient && form.penghadap2Id
@@ -201,6 +205,20 @@ export default function NotarisActivityAddModalBody({
 
   return (
     <div className="space-y-5">
+      {/* Nama Aktivitas */}
+      <InputTextAuth
+        type="text"
+        defaultValue={form.name}
+        updateType="name"
+        containerStyle="mt-4"
+        labelTitle={
+          <>
+            Nama Aktivitas <span className="text-red-500">*</span>
+          </>
+        }
+        updateFormValue={updateFormValue}
+      />
+
       {/* Jenis Akta */}
       <SelectBoxSearch
         labelTitle={
@@ -268,7 +286,7 @@ export default function NotarisActivityAddModalBody({
           Tutup
         </button>
         <button
-          className={`btn btn-primary ${saving ? "loading" : ""}`}
+          className={`btn bg-[] ${saving ? "loading" : ""}`}
           onClick={handleSave}
           disabled={saving}
         >

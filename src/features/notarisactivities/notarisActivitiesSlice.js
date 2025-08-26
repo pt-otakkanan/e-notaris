@@ -1,4 +1,3 @@
-// src/features/notaris-activities/notarisActivitiesSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import NotarisActivityService from "../../services/notarisActivity.service";
 
@@ -31,7 +30,6 @@ export const deleteNotarisActivityById = createAsyncThunk(
   async (id, { getState, dispatch, rejectWithValue }) => {
     try {
       await NotarisActivityService.remove(id);
-      // refetch pakai lastQuery biar tabel & paging konsisten
       const { notarisActivities } = getState();
       await dispatch(fetchNotarisActivities(notarisActivities.lastQuery));
       return true;
@@ -46,6 +44,14 @@ export const deleteNotarisActivityById = createAsyncThunk(
 const mapStatus = (s) => {
   const k = String(s || "").toLowerCase();
   if (k === "approved") return "Selesai";
+  if (k === "pending") return "Menunggu";
+  if (k === "rejected") return "Ditolak";
+  return "Tidak diketahui";
+};
+
+const mapApprovalStatus = (s) => {
+  const k = String(s || "").toLowerCase();
+  if (k === "approved") return "Disetujui";
   if (k === "pending") return "Menunggu";
   if (k === "rejected") return "Ditolak";
   return "Tidak diketahui";
@@ -78,31 +84,55 @@ const slice = createSlice({
         const arr = Array.isArray(payload.data) ? payload.data : [];
         state.meta = payload.meta || null;
 
-        // map kolom BE -> FE
         state.items = arr.map((it) => {
           const deed = pickRel(it, "deed");
           const first = pickRel(it, "first_client");
           const second = pickRel(it, "second_client");
           const schedules = it.schedules || [];
-
-          // ambil jadwal pertama jika ada (sesuaikan field mu, mis. scheduled_at / start_time)
           const firstSchedule = schedules[0] || null;
-          const scheduled_at =
-            firstSchedule?.scheduled_at ||
-            firstSchedule?.start_time ||
-            firstSchedule?.date_time ||
-            null;
+
+          // Gabungkan tanggal + jam,
+          // BE kirim date: "2025-08-28T00:00:00.000000Z", time: "HH:mm"
+          let schedule_id = null;
+          let scheduled_date = null;
+          let schedule_location = null;
+          let schedule_notes = null;
+          let schedule_status = null;
+
+          if (firstSchedule) {
+            const ymd = (firstSchedule.date || "").slice(0, 10); // "YYYY-MM-DD"
+            const t = firstSchedule.time || "00:00"; // "HH:mm"
+            scheduled_date = ymd ? `${ymd} ${t}` : null; // "YYYY-MM-DD HH:mm"
+            schedule_location = firstSchedule.location || null;
+            schedule_notes = firstSchedule.notes || null;
+            schedule_status = firstSchedule.status || null;
+            schedule_id = firstSchedule.id || null;
+          }
 
           return {
             id: it.id,
             kode: it.tracking_code,
+            nama: it.name,
             jenis_akta: deed?.name || "-",
             penghadap1: first?.name || "-",
-            penghadap2: second?.name || (second === null ? "-" : ""), // "-" jika single client
-            status_raw: it.status_approval, // pending|approved|rejected
+            penghadap2: second?.name || (second === null ? "-" : ""),
+            status_raw: it.status_approval,
             status: mapStatus(it.status_approval),
-            draft_akta: it.draft_file || null, // kalau BE punya field ini
-            scheduled_date: scheduled_at, // untuk tombol jadwal
+
+            // status approval penghadap
+            status_penghadap1_raw: it.first_client_approval,
+            status_penghadap1: mapApprovalStatus(it.first_client_approval),
+            status_penghadap2_raw: it.second_client_approval,
+            status_penghadap2: mapApprovalStatus(it.second_client_approval),
+
+            draft_akta: it.draft_file || null,
+
+            // penjadwalan
+            scheduled_date,
+            schedule_location,
+            schedule_notes,
+            schedule_status,
+            schedule_id,
           };
         });
       })
