@@ -8,11 +8,16 @@ export default function VerifyCode() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Ambil email dari state (prefer), fallback ke localStorage (opsional)
-  const emailFromState = location?.state?.email || "";
-  const [email, setEmail] = useState(
-    emailFromState || localStorage.getItem("pendingEmail") || ""
-  );
+  // Ambil email awal (dari state router atau localStorage)
+  const initialEmail =
+    location?.state?.email ?? localStorage.getItem("pendingEmail") ?? "";
+
+  // 1) State untuk input (boleh berubah saat user mengetik)
+  const [email, setEmail] = useState(initialEmail);
+
+  // 2) State untuk teks keterangan (tetap, hanya diganti saat aksi tertentu)
+  const [displayEmail, setDisplayEmail] = useState(initialEmail);
+
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -118,17 +123,9 @@ export default function VerifyCode() {
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center"
-      style={{ backgroundColor: "#ccb0b2" }}
-    >
+    <div className="min-h-screen flex items-center bg-gray-200">
       <div className="card mx-auto w-full max-w-5xl shadow-xl rounded-none md:rounded-xl overflow-hidden">
-        <div
-          className="grid md:grid-cols-2 grid-cols-1"
-          style={{
-            background: "linear-gradient(180deg, #ffffff 0%, #ccb0b2 100%)",
-          }}
-        >
+        <div className="grid md:grid-cols-2 grid-cols-1 bg-white">
           <div className="rounded-xl" style={{ backgroundColor: "#96696d" }}>
             <LandingIntro />
           </div>
@@ -140,8 +137,8 @@ export default function VerifyCode() {
             </h2>
             <div className="text-center mt-4 mb-6 text-black">
               Masukkan <b>kode verifikasi</b>
-              {email
-                ? ` yang kami kirim ke ${email}.`
+              {displayEmail
+                ? ` yang kami kirim ke ${displayEmail}.`
                 : " yang kami kirim ke email Anda."}
             </div>
 
@@ -182,7 +179,7 @@ export default function VerifyCode() {
               <div className="mb-2">
                 <InputText
                   type="email"
-                  defaultValue={email}
+                  value={email}
                   updateType="email"
                   containerStyle="mt-4"
                   labelTitle="Email"
@@ -195,7 +192,7 @@ export default function VerifyCode() {
               <div className="mb-4 mt-4">
                 <InputText
                   type="text"
-                  defaultValue={code}
+                  value={code}
                   updateType="code"
                   containerStyle="mt-4"
                   labelTitle="Kode Verifikasi"
@@ -208,10 +205,9 @@ export default function VerifyCode() {
                 <button
                   type="submit"
                   className={
-                    "btn mt-1 w-60 border-r-0 text-white text-lg rounded-full border-gray-300 p-2 w-72"
+                    "btn mt-1 w-60 border-r-0 text-white text-lg rounded-full border-gray-300 p-2 w-72 bg-[#0256c4]"
                   }
                   style={{
-                    backgroundColor: "#474747",
                     width: "240px",
                     height: "45px",
                   }}

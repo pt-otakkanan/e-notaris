@@ -6,16 +6,17 @@ import DocumentTextIcon from "@heroicons/react/24/outline/DocumentTextIcon";
 import CheckCircleIcon from "@heroicons/react/24/outline/CheckCircleIcon";
 import ExclamationTriangleIcon from "@heroicons/react/24/outline/ExclamationTriangleIcon";
 
-export default function NotarisActivityScheduleModalBody({
+export default function NotarisActivityScheduleDetailModalBody({
   extraObject = {},
   closeModal,
 }) {
   const { activity = {}, schedule = {} } = extraObject || {};
-
   const { scheduledDate, location, notes, status = "confirmed" } = schedule;
 
   const hasSchedule = scheduledDate;
-  const scheduleDateTime = hasSchedule ? moment(scheduledDate) : null;
+  const scheduleDateTime = hasSchedule
+    ? moment(scheduledDate, "YYYY-MM-DD HH:mm")
+    : null;
   const isUpcoming = scheduleDateTime?.isAfter(moment());
   const isPast = scheduleDateTime?.isBefore(moment());
   const isToday = scheduleDateTime?.isSame(moment(), "day");
@@ -29,7 +30,6 @@ export default function NotarisActivityScheduleModalBody({
         bgClass: "bg-gray-100",
       };
     }
-
     if (isPast) {
       return {
         icon: CheckCircleIcon,
@@ -38,7 +38,6 @@ export default function NotarisActivityScheduleModalBody({
         bgClass: "bg-green-50",
       };
     }
-
     if (isToday) {
       return {
         icon: ClockIcon,
@@ -47,7 +46,6 @@ export default function NotarisActivityScheduleModalBody({
         bgClass: "bg-orange-50",
       };
     }
-
     return {
       icon: CalendarIcon,
       text: "Akan Datang",
@@ -84,7 +82,7 @@ export default function NotarisActivityScheduleModalBody({
           </div>
           <div>
             <span className="text-gray-600">Penghadap 2:</span>
-            <span className="ml-2">{activity.penghadap2}</span>
+            <span className="ml-2">{activity.penghadap2 || "-"}</span>
           </div>
         </div>
       </div>
@@ -113,7 +111,7 @@ export default function NotarisActivityScheduleModalBody({
         <div className="space-y-4">
           <h4 className="font-semibold text-lg">Detail Penjadwalan</h4>
 
-          {/* Tanggal dan Waktu */}
+          {/* Tanggal & Waktu */}
           <div className="bg-white border border-gray-200 rounded-lg p-4">
             <div className="flex items-start gap-4">
               <CalendarIcon className="w-6 h-6 text-blue-600 mt-1 flex-shrink-0" />
@@ -167,33 +165,8 @@ export default function NotarisActivityScheduleModalBody({
               </div>
             </div>
           )}
-
-          {/* Reminder untuk pertemuan */}
-          {isUpcoming && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600 mt-0.5" />
-                <div>
-                  <h5 className="font-medium text-yellow-800">
-                    Persiapan Pertemuan
-                  </h5>
-                  <div className="mt-2 text-sm text-yellow-700">
-                    <ul className="list-disc list-inside space-y-1">
-                      <li>Pastikan membawa semua dokumen yang diperlukan</li>
-                      <li>Datang 10-15 menit sebelum waktu yang dijadwalkan</li>
-                      <li>Bawa identitas asli (KTP/SIM/Paspor)</li>
-                      {location && (
-                        <li>Pastikan lokasi pertemuan: {location}</li>
-                      )}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       ) : (
-        /* Belum ada jadwal */
         <div className="text-center py-8">
           <CalendarIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <h4 className="text-lg font-medium text-gray-600 mb-2">
@@ -207,7 +180,7 @@ export default function NotarisActivityScheduleModalBody({
         </div>
       )}
 
-      {/* Button Close */}
+      {/* Close */}
       <div className="flex justify-end pt-4">
         <button className="btn btn-primary" onClick={closeModal}>
           Tutup
