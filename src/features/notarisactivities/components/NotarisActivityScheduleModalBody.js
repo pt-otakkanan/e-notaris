@@ -1,3 +1,4 @@
+// Perbaikan untuk NotarisActivityScheduleModalBody
 import { useState, useEffect } from "react";
 import moment from "moment";
 import TextAreaInput from "../../../components/Input/TextAreaInput";
@@ -21,14 +22,22 @@ export default function NotarisActivityScheduleModalBody({
   });
   const [error, setError] = useState("");
 
-  // Prefill dari existingSchedule (bisa date atau datetime)
+  // Prefill dari existingSchedule dan activity data
   useEffect(() => {
     if (existingSchedule) {
       const schedule = moment(existingSchedule);
       setForm({
         date: schedule.format("YYYY-MM-DD"),
         time: schedule.format("HH:mm"),
-        location: activity.location || "",
+        location: activity.schedule_location || "", // Ambil dari field yang benar
+        notes: activity.schedule_notes || "",
+      });
+    } else {
+      // Jika tidak ada schedule, tapi mungkin ada data lokasi/notes dari activity
+      setForm({
+        date: "",
+        time: "",
+        location: activity.schedule_location || "",
         notes: activity.schedule_notes || "",
       });
     }
@@ -42,7 +51,6 @@ export default function NotarisActivityScheduleModalBody({
   const minDate = moment().format("YYYY-MM-DD");
   const maxDate = moment().add(3, "months").format("YYYY-MM-DD");
 
-  // Validasi form (dengan waktu)
   const validateForm = () => {
     if (!form.date) {
       setError("Tanggal harus dipilih.");
@@ -52,47 +60,39 @@ export default function NotarisActivityScheduleModalBody({
       setError("Waktu harus dipilih.");
       return false;
     }
+    if (!form.location?.trim()) {
+      setError("Lokasi wajib diisi.");
+      return false;
+    }
 
-    // Tanggal+waktu tidak boleh di masa lalu
-    const selectedDateTime = moment(
-      `${form.date} ${form.time}`,
-      "YYYY-MM-DD HH:mm"
-    );
-    if (selectedDateTime.isBefore(moment())) {
+    const selected = moment(`${form.date} ${form.time}`, "YYYY-MM-DD HH:mm");
+    if (selected.isBefore(moment())) {
       setError("Tidak dapat menjadwalkan di waktu yang sudah lewat.");
       return false;
     }
-
-    // Hanya hari kerja (opsional)
-    const dayOfWeek = moment(form.date).day();
-    if (dayOfWeek === 0 || dayOfWeek === 6) {
+    const dow = moment(form.date).day();
+    if (dow === 0 || dow === 6) {
       setError("Penjadwalan hanya tersedia pada hari kerja (Senin–Jumat).");
       return false;
     }
-
     return true;
   };
 
   const handleSave = () => {
     if (!validateForm()) return;
 
-    const scheduledDateTimeISO = moment(
-      `${form.date} ${form.time}`,
-      "YYYY-MM-DD HH:mm"
-    ).toISOString();
-
+    console.log("Submitting schedule:", form);
     const scheduleData = {
-      ...form,
       activityId: activity.id,
-      scheduledDate: form.date, // "YYYY-MM-DD"
-      scheduledTime: form.time, // "HH:mm"
-      scheduledDateTimeISO, // ISO string gabungan tanggal+waktu
-      activityCode: activity.kode,
-      activityType: activity.jenis_akta,
+      scheduledDate: form.date,
+      scheduledTime: form.time,
+      location: form.location.trim(),
+      notes: form.notes?.trim() || "",
+      isUpdate: !!existingSchedule, // Flag untuk menentukan update/create
     };
 
     setError("");
-    if (typeof onSubmit === "function") onSubmit(scheduleData);
+    onSubmit?.(scheduleData);
     closeModal();
   };
 
@@ -100,11 +100,9 @@ export default function NotarisActivityScheduleModalBody({
     if (window.confirm("Yakin ingin menghapus jadwal ini?")) {
       const clearData = {
         activityId: activity.id,
-        scheduledDate: null,
-        scheduledTime: null,
-        scheduledDateTimeISO: null,
+        isDelete: true,
       };
-      if (typeof onSubmit === "function") onSubmit(clearData);
+      onSubmit?.(clearData);
       closeModal();
     }
   };
@@ -129,14 +127,13 @@ export default function NotarisActivityScheduleModalBody({
           </div>
           <div>
             <span className="text-gray-600">Penghadap 2:</span>
-            <span className="ml-2">{activity.penghadap2}</span>
+            <span className="ml-2">{activity.penghadap2 || "-"}</span>
           </div>
         </div>
       </div>
 
-      {/* Form Penjadwalan (dengan waktu) */}
+      {/* Form Penjadwalan */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Tanggal */}
         <div className="form-control">
           <label className="label">
             <span className="label-text font-semibold">
@@ -160,7 +157,6 @@ export default function NotarisActivityScheduleModalBody({
           </label>
         </div>
 
-        {/* Waktu */}
         <div className="form-control">
           <label className="label">
             <span className="label-text font-semibold">
@@ -175,7 +171,7 @@ export default function NotarisActivityScheduleModalBody({
               updateFormValue({ updateType: "time", value: e.target.value })
             }
             disabled={!form.date}
-            step="900" // 15 menit; ubah sesuai kebutuhan
+            step="900"
           />
           <label className="label">
             <span className="label-text-alt text-gray-500">
@@ -187,21 +183,24 @@ export default function NotarisActivityScheduleModalBody({
 
       <InputText
         labelTitle="Lokasi Pertemuan"
-        defaultValue={form.location}
+        containerStyle="mt-4"
+        value={form.location}
         updateFormValue={updateFormValue}
         updateType="location"
         placeholder="Kantor notaris, rumah klien, dll."
+        isRequired={true}
       />
 
       <TextAreaInput
         labelTitle="Catatan Tambahan"
-        defaultValue={form.notes}
+        containerStyle="mt-4"
+        value={form.notes} // dikontrol dari parent
         updateFormValue={updateFormValue}
         updateType="notes"
         placeholder="Dokumen yang perlu disiapkan, catatan khusus, dll."
       />
 
-      {error ? (
+      {error && (
         <div className="alert alert-error my-2 py-2 text-sm relative">
           {error}
           <button
@@ -213,7 +212,7 @@ export default function NotarisActivityScheduleModalBody({
             ✕
           </button>
         </div>
-      ) : null}
+      )}
 
       <div className="flex justify-between pt-4">
         <div>
@@ -234,7 +233,7 @@ export default function NotarisActivityScheduleModalBody({
           <button
             className="btn btn-primary"
             onClick={handleSave}
-            disabled={!form.date || !form.time}
+            disabled={!form.date || !form.time || !form.location?.trim()}
           >
             {existingSchedule ? "Perbarui Jadwal" : "Simpan Jadwal"}
           </button>

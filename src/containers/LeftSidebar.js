@@ -52,8 +52,8 @@ function LeftSidebar() {
                     `${
                       isActive
                         ? "font-semibold bg-white text-[#0256c4] dark:bg-[#3b3b3b]"
-                        : "font-normal text-white"
-                    } `
+                        : "font-normal"
+                    } text-white`
                   }
                 >
                   {route.icon} {route.name}
