@@ -278,8 +278,8 @@ function ProfileSettings() {
         <div
           className={`tab tab-bordered transition-all duration-200 cursor-pointer ${
             activeTab === "profile"
-              ? "tab-active text-white bg-[#96696d] dark:bg-[#92bbcc] dark:text-primary-content"
-              : "bg-base-200 hover:bg-base-300 text-base-content"
+              ? "tab-active text-white bg-[#0256c4] dark:bg-[#7b9cc9] dark:text-primary-content"
+              : "bg-base-200 hover:bg-base-300 text-base-content dark:bg-[#01043c]"
           }`}
           onClick={() => setActiveTab("profile")}
         >
@@ -288,8 +288,8 @@ function ProfileSettings() {
         <div
           className={`tab tab-bordered transition-all duration-200 cursor-pointer ${
             activeTab === "verifikasi"
-              ? "tab-active text-white bg-[#96696d] dark:bg-[#92bbcc] dark:text-primary-content"
-              : "bg-base-200 hover:bg-base-300 text-base-content"
+              ? "tab-active text-white  bg-[#0256c4] dark:bg-[#7b9cc9] dark:text-primary-content"
+              : "bg-base-200 hover:bg-base-300 text-base-content dark:bg-[#01043c]"
           }`}
           onClick={() => setActiveTab("verifikasi")}
         >
@@ -458,7 +458,9 @@ function ProfileSettings() {
 
       <div className="mt-16">
         <button
-          className={`btn btn-primary float-right ${saving ? "loading" : ""}`}
+          className={`btn bg-[#0256c4] text-white hover:text-[#01043c] dark:bg-[#7b9cc9] dark:text-[#01043c] dark:hover:bg-gray-400 dark:hover:text-white float-right ${
+            saving ? "loading" : ""
+          }`}
           onClick={onClickUpdate}
           disabled={saving}
         >
