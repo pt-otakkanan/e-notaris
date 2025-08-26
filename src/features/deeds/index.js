@@ -114,7 +114,7 @@ function Deeds() {
         </button>
       </div>
       <button
-        className="btn btn-sm bg-[#96696d] text-white"
+        className="btn btn-sm bg-[#0256c4] text-white"
         onClick={openAddModal}
       >
         Tambah
@@ -205,19 +205,19 @@ function Deeds() {
                     </td>
                     <td>
                       <button
-                        className="text-green-7 rounded-lg text-sm px-3 py-1.5 me-2 bg-green-800 text-white"
+                        className="text-green-7 rounded-lg text-sm px-3 py-1.5 me-2 bg-add"
                         onClick={() => addRequirement(row)}
                       >
                         Tambah Data
                       </button>
                       <button
-                        className="text-blue-7 rounded-lg text-sm px-3 py-1.5 me-2 bg-blue-800 text-white"
+                        className="text-blue-7 rounded-lg text-sm px-3 py-1.5 me-2 bg-detail"
                         onClick={() => openDetail(row)}
                       >
                         Detail
                       </button>
                       <button
-                        className="text-red-7 rounded-lg text-sm px-3 py-1.5 me-2 bg-red-800 text-white"
+                        className="text-red-7 rounded-lg text-sm px-3 py-1.5 me-2 bg-delete"
                         onClick={() => askDelete(row)}
                       >
                         Hapus

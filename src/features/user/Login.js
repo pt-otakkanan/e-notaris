@@ -102,17 +102,9 @@ export default function Login() {
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center"
-      style={{ backgroundColor: "#ccb0b2" }}
-    >
+    <div className="min-h-screen flex items-center bg-gray-200">
       <div className="card mx-auto w-full max-w-5xl shadow-xl rounded-none md:rounded-xl overflow-hidden">
-        <div
-          className="grid md:grid-cols-2 grid-cols-1"
-          style={{
-            background: "linear-gradient(180deg, #ffffff 0%, #ccb0b2 100%)",
-          }}
-        >
+        <div className="grid md:grid-cols-2 grid-cols-1 bg-white">
           <div className="rounded-xl" style={{ backgroundColor: "#96696d" }}>
             <LandingIntro />
           </div>
@@ -201,10 +193,9 @@ export default function Login() {
                 <button
                   type="submit"
                   className={
-                    "btn w-72 text-white text-lg rounded-full border-gray-300 p-2"
+                    "btn w-72 text-white text-lg rounded-full border-gray-300 p-2 bg-[#0256c4]"
                   }
                   style={{
-                    backgroundColor: "#474747",
                     width: "240px",
                     height: "45px",
                   }}

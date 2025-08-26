@@ -7,7 +7,7 @@
 
 [data-theme="dark"] .drawer-side .menu li > *:active,
 [data-theme="dark"] .drawer-side .menu li > *.active {
-  background-color: #0e4356 !important; /* warna klik dark mode */
+  background-color: red !important; /* warna klik dark mode */
   color: #fff !important;
 }
 
@@ -41,6 +41,25 @@
 
 .App-link {
   color: #61dafb;
+}
+
+.bg-gradient {
+  background: linear-gradient(135deg, #0256c4 0%, #0377ff 50%, #00aaff 100%);
+}
+
+.bg-detail {
+  background-color: #edf4ff;
+  color: #0256c4;
+}
+
+.bg-delete {
+  background-color: #ffeded;
+  color: #c40202;
+}
+
+.bg-add {
+  background-color: #efffed;
+  color: #0fc402;
 }
 
 @keyframes App-logo-spin {

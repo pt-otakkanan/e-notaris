@@ -65,7 +65,7 @@ export default function UserDeleteModalBody({ extraObject = {}, closeModal }) {
           Batalkan
         </button>
         <button
-          className={`btn hover:text-black text-white bg-[#96696d] w-36`}
+          className={`btn hover:text-black text-white bg-[#0256c4] w-36`}
           onClick={onConfirmDelete}
           disabled={loading}
         >

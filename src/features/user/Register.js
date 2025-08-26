@@ -115,17 +115,9 @@ export default function Register() {
   };
 
   return (
-    <div
-      className="min-h-screen bg-base-200 flex items-center"
-      style={{ backgroundColor: "#ccb0b2" }}
-    >
+    <div className="min-h-screen bg-gray-200 flex items-center">
       <div className="card mx-auto w-full max-w-5xl shadow-xl">
-        <div
-          className="grid md:grid-cols-2 grid-cols-1 bg-base-100 rounded-none md:rounded-xl"
-          style={{
-            background: "linear-gradient(180deg, #ffffff 0%, #ccb0b2 100%)",
-          }}
-        >
+        <div className="grid md:grid-cols-2 grid-cols-1 bg-base-100 rounded-none md:rounded-xl bg-white">
           <div className="rounded-xl" style={{ backgroundColor: "#96696d" }}>
             <LandingIntro />
           </div>
@@ -179,6 +171,7 @@ export default function Register() {
                   containerStyle="mt-4"
                   labelTitle="Nama Lengkap"
                   updateFormValue={updateFormValue}
+                  placeholder={"Masukkan nama lengkap Anda"}
                 />
 
                 <InputTextAuth
@@ -187,6 +180,7 @@ export default function Register() {
                   containerStyle="mt-4"
                   labelTitle="Email"
                   updateFormValue={updateFormValue}
+                  placeholder="Masukkan email"
                 />
 
                 <InputTextAuth
@@ -196,6 +190,7 @@ export default function Register() {
                   containerStyle="mt-4"
                   labelTitle="Kata Sandi"
                   updateFormValue={updateFormValue}
+                  placeholder="Masukkan kata sandi"
                 />
 
                 <InputTextAuth
@@ -205,6 +200,7 @@ export default function Register() {
                   containerStyle="mt-4 text-black"
                   labelTitle="Konfirmasi Kata Sandi"
                   updateFormValue={updateFormValue}
+                  placeholder="Masukkan ulang kata sandi"
                 />
 
                 {/* Pilihan Peran */}
@@ -236,10 +232,9 @@ export default function Register() {
                 <button
                   type="submit"
                   className={
-                    "btn mt-1 w-60 mt-6 border-r-0 text-white text-lg rounded-full border-gray-300 p-2 w-72"
+                    "btn mt-1 w-60 mt-6 border-r-0 text-white text-lg rounded-full border-gray-300 p-2 w-72 bg-[#0256c4]"
                   }
                   style={{
-                    backgroundColor: "#474747",
                     width: "240px",
                     height: "45px",
                   }}

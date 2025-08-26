@@ -57,7 +57,7 @@ const routes = [
   {
     path: "/app/notaris-activities-client",
     icon: <DocumentDuplicateIcon className={iconClasses} />,
-    name: "Aktivitas Notaris (Penghadap)",
+    name: "Aktivitas Notaris",
   },
   // {
   //   path: "/app/leads",

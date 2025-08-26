@@ -206,8 +206,8 @@ function NotarisActivities() {
         ].map((t) => (
           <button
             key={t.v || "all"}
-            className={`btn btn-sm join-item ${
-              statusTab === t.v ? "btn-primary" : "btn-outline"
+            className={`btn btn-sm join-item hover:bg-[#0256c4] ${
+              statusTab === t.v ? "bg-[#0256c4] text-white" : "btn-outline"
             }`}
             onClick={() => changeTab(t.v)}
           >

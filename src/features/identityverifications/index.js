@@ -163,8 +163,8 @@ function IdentityVerifications() {
         ].map((t) => (
           <button
             key={t.v}
-            className={`btn btn-sm join-item ${
-              statusTab === t.v ? "btn-primary" : "btn-outline"
+            className={`btn btn-sm join-item hover:bg-[#0256c4] ${
+              statusTab === t.v ? "bg-[#0256c4] text-white" : "btn-outline "
             }`}
             onClick={() => changeTab(t.v)}
           >
@@ -242,7 +242,7 @@ function IdentityVerifications() {
                     </td>
                     <td className="flex">
                       <button
-                        className="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1.5 text-center me-2 mb-2 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-800"
+                        className="text-blue-7 rounded-lg text-sm px-3 py-1.5 me-2 bg-detail"
                         onClick={() => openDetailUser(row.user_id)}
                       >
                         Detail
@@ -258,13 +258,13 @@ function IdentityVerifications() {
                         return (
                           <>
                             <button
-                              className="text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-3 py-1.5 text-center me-2 mb-2 dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800"
+                              className="text-blue-7 rounded-lg text-sm px-3 py-1.5 me-2 bg-add"
                               onClick={() => askApprove(row)}
                             >
                               Setujui
                             </button>
                             <button
-                              className="text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-1.5 text-center me-2 mb-2 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-800"
+                              className="text-blue-7 rounded-lg text-sm px-3 py-1.5 me-2 bg-deletep"
                               onClick={() => askReject(row)}
                             >
                               Tolak

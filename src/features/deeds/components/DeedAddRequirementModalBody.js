@@ -140,7 +140,7 @@ export default function DeedAddRequirementModalBody({
           Tutup
         </button>
         <button
-          className={`btn btn-primary ${saving ? "loading" : ""}`}
+          className={`btn bg-[#0256c4] text-white ${saving ? "loading" : ""}`}
           onClick={handleSave}
           disabled={saving}
         >

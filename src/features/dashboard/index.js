@@ -17,25 +17,25 @@ const statsData = [
   {
     title: "Total Notaris",
     value: "34.7k",
-    icon: <UserGroupIcon className="w-8 h-8 text-[#96696d]" />,
+    icon: <UserGroupIcon className="w-8 h-8 text-white" />,
     description: "↗︎ 2300 (22%)",
   },
   {
     title: "Total Penghadap",
     value: "34,545",
-    icon: <UserGroupIcon className="w-8 h-8 text-[#96696d]" />,
+    icon: <UserGroupIcon className="w-8 h-8 text-white" />,
     description: "Current month",
   },
   {
     title: "Total Akta",
     value: "450",
-    icon: <CircleStackIcon className="w-8 h-8 text-[#96696d]" />,
+    icon: <CircleStackIcon className="w-8 h-8 text-white" />,
     description: "50 in hot leads",
   },
   {
     title: "Total Aktivitas Notaris",
     value: "5.6k",
-    icon: <UsersIcon className="w-8 h-8 text-[#96696d]" />,
+    icon: <UsersIcon className="w-8 h-8 text-white" />,
     description: "↗︎ 300 (18%)",
   },
 ];

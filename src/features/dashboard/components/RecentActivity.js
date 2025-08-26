@@ -63,29 +63,27 @@ function getStatusInfo(status) {
 function RecentActivity() {
   return (
     <TitleCard title={"Aktivitas Terkini"}>
-      <div className="bg-base-100 shadow"></div>
+      <div className="bg-detail shadow"></div>
 
       {/** Table Data */}
       <div className="overflow-x-auto">
         <table className="table w-full ">
-          <thead>
-            <tr>
-              <th className="normal-case text-lg text-black bg-[#efe0e1]">
+          <thead className="rounded-t-lg">
+            <tr className="">
+              <th className="normal-case text-lg text-white bg-detail rounded-tl-md">
                 Nomor
               </th>
-              <th className="normal-case text-lg text-black bg-[#efe0e1]">
-                Kode
-              </th>
-              <th className="normal-case text-lg text-black bg-[#efe0e1]">
+              <th className="normal-case text-lg text-white bg-detail">Kode</th>
+              <th className="normal-case text-lg text-white bg-detail">
                 Jenis Akta
               </th>
-              <th className="normal-case text-lg text-black bg-[#efe0e1]">
+              <th className="normal-case text-lg text-white bg-detail">
                 Penghadap 1
               </th>
-              <th className="normal-case text-lg text-black bg-[#efe0e1]">
+              <th className="normal-case text-lg text-white bg-detail">
                 Penghadap 2
               </th>
-              <th className="normal-case text-lg text-black bg-[#efe0e1]">
+              <th className="normal-case text-lg text-white bg-detail rounded-tr-md">
                 Status
               </th>
             </tr>
@@ -113,7 +111,9 @@ function RecentActivity() {
         </table>
       </div>
       <div className="flex justify-end mt-5">
-        <button className="mt-5 btn bg-[#efe0e1] w-full">Lihat Detail</button>
+        <button className="mt-5 btn bg-detail text-white w-full">
+          Lihat Detail
+        </button>
       </div>
     </TitleCard>
   );

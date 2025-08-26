@@ -211,13 +211,13 @@ function Users() {
                       </td>
                       <td className="flex">
                         <button
-                          className="text-blue-7 rounded-lg text-sm px-3 py-1 me-2 bg-blue-800 text-white"
+                          className="text-blue-7 rounded-lg text-sm px-3 py-1 me-2 bg-detail"
                           onClick={() => openDetailUser(u.id)}
                         >
                           Detail
                         </button>
                         <button
-                          className="text-red-7 rounded-lg text-sm px-3 py-1.5 me-2 bg-red-800 text-white"
+                          className="text-red-7 rounded-lg text-sm px-3 py-1.5 me-2 bg-delete"
                           onClick={() => askDelete(u)}
                         >
                           Hapus
