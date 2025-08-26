@@ -37,7 +37,7 @@ const routes = [
   {
     path: "/app/deeds",
     icon: <DocumentTextIcon className={iconClasses} />,
-    name: "Data Otentik",
+    name: "Akta Otentik",
   },
   {
     path: "/app/users",
@@ -57,7 +57,7 @@ const routes = [
   {
     path: "/app/notaris-activities-client",
     icon: <DocumentDuplicateIcon className={iconClasses} />,
-    name: "Aktivitas Notaris (Penghadap)",
+    name: "Aktivitas Notaris",
   },
   // {
   //   path: "/app/leads",

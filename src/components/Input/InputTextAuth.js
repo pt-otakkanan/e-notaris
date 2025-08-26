@@ -29,7 +29,7 @@ function InputTextAuth({
         value={value}
         placeholder={placeholder || ""}
         onChange={(e) => updateInputValue(e.target.value)}
-        className="input input-bordered w-full bg-[#96696d] text-base-content text-white"
+        className="input input-bordered w-full bg-white text-base-content text-black"
         disabled={disabled}
       />
     </div>

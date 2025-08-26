@@ -67,6 +67,7 @@ function Requirements() {
               labelStyle="after:content-['*'] after:ml-1 after:text-red-500"
               accept=".pdf,.jpg,.jpeg,.png"
               required
+              maxSizeMB={2}
               updateType="ktp"
               updateFormValue={updateFormValue}
               defaultPreviewUrl={form.ktp.previewUrl}
@@ -77,6 +78,7 @@ function Requirements() {
               labelStyle="after:content-['*'] after:ml-1 after:text-red-500"
               accept=".pdf,.jpg,.jpeg,.png"
               required
+              maxSizeMB={2}
               updateType="npwp"
               updateFormValue={updateFormValue}
               defaultPreviewUrl={form.npwp.previewUrl}
@@ -86,6 +88,7 @@ function Requirements() {
               labelTitle="File NIB (Nomor Induk Berusaha)"
               accept=".pdf,.jpg,.jpeg,.png"
               updateType="nib"
+              maxSizeMB={2}
               updateFormValue={updateFormValue}
               defaultPreviewUrl={form.nib.previewUrl}
             />
@@ -93,6 +96,7 @@ function Requirements() {
             <FileInput
               labelTitle="File TDP (Tanda Daftar Perusahaan)"
               accept=".pdf,.jpg,.jpeg,.png"
+              maxSizeMB={2}
               updateType="tdp"
               updateFormValue={updateFormValue}
               defaultPreviewUrl={form.tdp.previewUrl}

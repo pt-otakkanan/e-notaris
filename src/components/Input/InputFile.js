@@ -1,117 +1,136 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 function FileInput({
   labelTitle,
   labelStyle = "",
   containerStyle = "",
-  accept = ".pdf,.jpg,.jpeg,.png",
+  accept = ".jpg,.jpeg,.png",
   required = false,
-  updateFormValue, // (payload) => void
-  updateType, // string key
-  defaultFile = null, // optional: File | null
-  defaultPreviewUrl = "", // optional: string (jika ada url awal)
+  maxSizeMB = 2, // ⬅️ batas ukuran (default 2MB)
+  updateFormValue, // ({ updateType, value: { file, previewUrl } })
+  updateType,
+  defaultFile = null,
+  defaultPreviewUrl = "",
 }) {
   const inputRef = useRef(null);
 
   const [file, setFile] = useState(defaultFile);
   const [previewUrl, setPreviewUrl] = useState(defaultPreviewUrl);
+  const [error, setError] = useState(""); // ⬅️ pesan error ukuran/format
 
-  const isImage = useMemo(() => file?.type?.startsWith("image/"), [file]);
+  // Sinkronkan URL server saat belum ada file lokal
+  useEffect(() => {
+    if (!file && defaultPreviewUrl !== previewUrl) {
+      setPreviewUrl(defaultPreviewUrl || "");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultPreviewUrl]);
 
-  const sizeInMB = useMemo(
-    () => (file ? (file.size / 1024 / 1024).toFixed(2) : "0.00"),
-    [file]
-  );
+  const isImage = useMemo(() => {
+    if (file) return file.type?.startsWith("image/");
+    if (!previewUrl) return false;
+    return /\.(png|jpe?g|webp|gif)$/i.test(previewUrl);
+  }, [file, previewUrl]);
+
+  const isPdf = useMemo(() => {
+    if (file) return file.type === "application/pdf";
+    if (!previewUrl) return false;
+    return /\.pdf($|\?)/i.test(previewUrl);
+  }, [file, previewUrl]);
+
+  const fileName = useMemo(() => {
+    if (file?.name) return file.name;
+    if (previewUrl) {
+      try {
+        const clean = previewUrl.split("?")[0];
+        return clean.split("/").pop() || "file";
+      } catch {
+        return "file";
+      }
+    }
+    return "";
+  }, [file, previewUrl]);
 
   const emitChange = (f, url) => {
-    // kirim ke parent dalam format konsisten
-    if (typeof updateFormValue === "function") {
-      updateFormValue({
-        updateType,
-        value: { file: f || null, previewUrl: url || "" },
-      });
-    }
+    updateFormValue?.({
+      updateType,
+      value: { file: f || null, previewUrl: url || "" },
+    });
   };
 
-  const handlePick = () => {
-    inputRef.current?.click();
+  const revokeBlob = () => {
+    if (previewUrl?.startsWith("blob:")) URL.revokeObjectURL(previewUrl);
   };
+
+  const handlePick = () => inputRef.current?.click();
 
   const handleChange = (e) => {
     const f = e.target.files?.[0];
     if (!f) return;
 
+    // Validasi ukuran (MB)
+    const sizeMB = f.size / 1024 / 1024;
+    if (sizeMB > maxSizeMB) {
+      setError(
+        `Ukuran file melebihi batas ${maxSizeMB}MB (ukuran sekarang ${sizeMB.toFixed(
+          2
+        )}MB).`
+      );
+      // reset input agar bisa pilih file sama lagi
+      e.target.value = "";
+      return;
+    }
+    setError("");
+
+    // Bersihkan preview sebelumnya jika blob
+    revokeBlob();
+
     setFile(f);
 
-    // bikin preview untuk image & pdf (pdf di-preview via window.open)
-    if (f.type.startsWith("image/")) {
+    if (f.type.startsWith("image/") || f.type === "application/pdf") {
       const url = URL.createObjectURL(f);
       setPreviewUrl(url);
       emitChange(f, url);
     } else {
-      setPreviewUrl(""); // non-image tidak auto-preview
+      setPreviewUrl("");
       emitChange(f, "");
     }
   };
 
   const handleRemove = () => {
+    revokeBlob();
     setFile(null);
     setPreviewUrl("");
+    setError("");
     if (inputRef.current) inputRef.current.value = "";
     emitChange(null, "");
   };
 
-  const handlePreviewPDF = () => {
+  const handlePreviewPDFLocal = () => {
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    window.open(url, "_blank");
+    const url = previewUrl || URL.createObjectURL(file);
+    window.open(url, "_blank", "noopener,noreferrer");
   };
+
+  const handlePreviewRemote = () => {
+    if (!previewUrl) return;
+    window.open(previewUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const hasLocalFile = !!file;
+  const hasRemoteUrl = !file && !!previewUrl;
 
   return (
     <div className={`form-control w-full ${containerStyle}`}>
-      {/* Label */}
       <label className="label">
         <span className={"label-text text-base-content " + labelStyle}>
           {labelTitle}
+          {required ? <span className="ml-1 text-red-500">*</span> : null}
         </span>
       </label>
 
-      {/* Area kosong (belum ada file) */}
-      {!file ? (
-        <div className="border-2 border-dashed border-base-300 rounded-lg p-6 text-center hover:border-[#96696d] dark:hover:border-[#92bbcc] transition-colors">
-          <input
-            ref={inputRef}
-            type="file"
-            accept={accept}
-            onChange={handleChange}
-            className="hidden"
-          />
-          <button type="button" className="cursor-pointer" onClick={handlePick}>
-            <div className="flex flex-col items-center">
-              <svg
-                className="w-8 h-8 mb-2 text-base-content/50"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                />
-              </svg>
-              <p className="text-sm text-base-content/70">
-                Klik untuk upload file
-              </p>
-              <p className="text-xs text-base-content/50 mt-1">
-                PDF, JPG, JPEG, PNG (Max 5MB)
-              </p>
-            </div>
-          </button>
-        </div>
-      ) : (
-        // Area saat sudah ada file
+      {/* 1) FILE LOKAL */}
+      {hasLocalFile && (
         <div className="border border-base-300 rounded-lg p-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-3">
@@ -148,9 +167,11 @@ function FileInput({
               </div>
               <div>
                 <p className="text-sm font-medium text-base-content">
-                  {file.name}
+                  {fileName}
                 </p>
-                <p className="text-xs text-base-content/70">{sizeInMB} MB</p>
+                <p className="text-xs text-base-content/70">
+                  {(file.size / 1024 / 1024).toFixed(2)} MB (maks {maxSizeMB}MB)
+                </p>
               </div>
             </div>
 
@@ -160,28 +181,15 @@ function FileInput({
               className="btn btn-ghost btn-sm btn-circle"
               aria-label="Remove file"
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              ✕
             </button>
           </div>
 
-          {/* Preview image */}
-          {previewUrl && isImage && (
+          {isImage && previewUrl && (
             <div className="mt-3">
               <img
                 src={previewUrl}
-                alt="Preview"
+                alt="Preview (local)"
                 className="max-w-full h-32 object-cover rounded border"
               />
             </div>
@@ -195,11 +203,10 @@ function FileInput({
             >
               Ganti File
             </button>
-
-            {file.type === "application/pdf" && (
+            {isPdf && (
               <button
                 type="button"
-                onClick={handlePreviewPDF}
+                onClick={handlePreviewPDFLocal}
                 className="btn btn-outline btn-sm"
               >
                 Preview PDF
@@ -207,7 +214,8 @@ function FileInput({
             )}
           </div>
 
-          {/* hidden input */}
+          {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+
           <input
             ref={inputRef}
             type="file"
@@ -215,6 +223,96 @@ function FileInput({
             onChange={handleChange}
             className="hidden"
           />
+        </div>
+      )}
+
+      {/* 2) FILE DARI SERVER */}
+      {!hasLocalFile && hasRemoteUrl && (
+        <div className="border border-base-300 rounded-lg p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-sm font-medium text-base-content">
+                {fileName}
+              </p>
+              <p className="text-xs text-base-content/70">
+                Sumber: Server (maks {maxSizeMB}MB bila ganti)
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handlePick}
+                className="btn btn-outline btn-sm"
+              >
+                Ganti File
+              </button>
+              <a
+                href={previewUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-outline btn-sm"
+              >
+                Lihat
+              </a>
+            </div>
+          </div>
+
+          {isImage && (
+            <div className="mt-3">
+              <img
+                src={previewUrl}
+                alt="Preview (server)"
+                className="max-w-full h-32 object-cover rounded border"
+              />
+            </div>
+          )}
+
+          {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+
+          <input
+            ref={inputRef}
+            type="file"
+            accept={accept}
+            onChange={handleChange}
+            className="hidden"
+          />
+        </div>
+      )}
+
+      {/* 3) BELUM ADA FILE */}
+      {!hasLocalFile && !hasRemoteUrl && (
+        <div className="border-2 border-dashed border-base-300 rounded-lg p-6 text-center hover:border-[#96696d] dark:hover:border-[#92bbcc] transition-colors">
+          <input
+            ref={inputRef}
+            type="file"
+            accept={accept}
+            onChange={handleChange}
+            className="hidden"
+          />
+          <button type="button" className="cursor-pointer" onClick={handlePick}>
+            <div className="flex flex-col items-center">
+              <svg
+                className="w-8 h-8 mb-2 text-base-content/50"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                />
+              </svg>
+              <p className="text-sm text-base-content/70">
+                Klik untuk upload file
+              </p>
+              <p className="text-xs text-base-content/50 mt-1">
+                {accept.toUpperCase()} (Maks {maxSizeMB}MB)
+              </p>
+            </div>
+          </button>
+          {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
         </div>
       )}
     </div>

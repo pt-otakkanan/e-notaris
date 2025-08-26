@@ -1,41 +1,61 @@
+import React, { useEffect, useState } from "react";
+import InformationCircleIcon from "@heroicons/react/24/outline/InformationCircleIcon";
 
-import axios from 'axios'
-import capitalize from 'capitalize-the-first-letter'
-import React, { useState, useEffect } from 'react'
-import InformationCircleIcon from '@heroicons/react/24/outline/InformationCircleIcon'
+function SelectBox({
+  labelTitle,
+  labelDescription,
+  value, // <- controlled value (opsional)
+  defaultValue, // <- initial value (fallback)
+  containerStyle = "",
+  placeholder = "Pilih...",
+  labelStyle = "",
+  options = [],
+  updateType,
+  updateFormValue,
+  disabled = false,
+}) {
+  const [inner, setInner] = useState(value ?? defaultValue ?? "");
 
+  // Sinkron saat value/defaultValue berubah (mis. setelah fetch profil)
+  useEffect(() => {
+    setInner(value ?? defaultValue ?? "");
+  }, [value, defaultValue]);
 
-function SelectBox(props){
-    
-    const {labelTitle, labelDescription, defaultValue, containerStyle, placeholder, labelStyle, options, updateType, updateFormValue} = props
+  const onChange = (newVal) => {
+    setInner(newVal);
+    updateFormValue?.({ updateType, value: newVal });
+  };
 
-    const [value, setValue] = useState(defaultValue || "")
+  return (
+    <div className={`form-control w-full ${containerStyle}`}>
+      <label className={`label ${labelStyle}`}>
+        <span className="label-text flex items-center gap-2">
+          {labelTitle}
+          {labelDescription ? (
+            <span className="tooltip tooltip-right" data-tip={labelDescription}>
+              <InformationCircleIcon className="w-4 h-4" />
+            </span>
+          ) : null}
+        </span>
+      </label>
 
-
-    const updateValue = (newValue) =>{
-        updateFormValue({updateType, value : newValue})
-        setValue(newValue)
-    }
-
-
-    return (
-        <div className={`inline-block ${containerStyle}`}>
-            <label  className={`label  ${labelStyle}`}>
-                <div className="label-text">{labelTitle}
-                {labelDescription && <div className="tooltip tooltip-right" data-tip={labelDescription}><InformationCircleIcon className='w-4 h-4'/></div>}
-                </div>
-            </label>
-
-            <select className="select select-bordered w-full" value={value} onChange={(e) => updateValue(e.target.value)}>
-                <option disabled value="PLACEHOLDER">{placeholder}</option>
-                {
-                    options.map((o, k) => {
-                        return <option value={o.value || o.name} key={k}>{o.name}</option>
-                    })
-                }
-            </select>
-        </div>
-    )
+      <select
+        className="select select-bordered w-full"
+        value={inner}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
+      >
+        <option value="" disabled>
+          {placeholder}
+        </option>
+        {options.map((o, i) => (
+          <option key={i} value={o.value ?? o.name}>
+            {o.name}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
 }
 
-export default SelectBox
+export default SelectBox;

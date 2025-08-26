@@ -1,133 +1,165 @@
+// src/features/user/userSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import UserService from "../../services/user.service";
 
-// util random
-const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
-
-// generator alamat dummy
-const generateAddress = () => {
-  const streets = [
-    "Jl. Merdeka",
-    "Jl. Sudirman",
-    "Jl. Ahmad Yani",
-    "Jl. Diponegoro",
-    "Jl. Imam Bonjol",
-    "Jl. Pahlawan",
-    "Jl. Gatot Subroto",
-    "Jl. S. Parman",
-    "Jl. RA Kartini",
-    "Jl. Gajah Mada",
-  ];
-  const cities = [
-    "Surabaya",
-    "Sidoarjo",
-    "Gresik",
-    "Malang",
-    "Jakarta",
-    "Bandung",
-    "Semarang",
-    "Yogyakarta",
-    "Denpasar",
-    "Makassar",
-  ];
-  const no = Math.floor(Math.random() * 200) + 1;
-  const rt = String(Math.floor(Math.random() * 10) + 1).padStart(2, "0");
-  const rw = String(Math.floor(Math.random() * 10) + 1).padStart(2, "0");
-  const kodePos = String(10000 + Math.floor(Math.random() * 90000));
-  return `${pick(streets)} No. ${no}, RT ${rt}/RW ${rw}, ${pick(
-    cities
-  )} ${kodePos}`;
+const mapGender = (g) => {
+  if (!g) return "-";
+  const s = String(g).toLowerCase();
+  if (s === "male") return "Laki-laki";
+  if (s === "female") return "Perempuan";
+  if (s === "lainnya") return "Lainnya";
+  return "-";
 };
 
-// dummy users
-const generateDummyUsers = (count = 20) => {
-  const firstNames = [
-    "Budi",
-    "Siti",
-    "Andi",
-    "Dewi",
-    "Agus",
-    "Rina",
-    "Joko",
-    "Lina",
-    "Tono",
-    "Fitri",
-  ];
-  const lastNames = [
-    "Santoso",
-    "Aisyah",
-    "Wijaya",
-    "Putri",
-    "Haryanto",
-    "Kusuma",
-    "Pratama",
-    "Utami",
-    "Saputra",
-    "Wulandari",
-  ];
-  const genders = ["Laki-laki", "Perempuan"];
-  const roles = ["Notaris", "Penghadap"];
-  const verifs = ["Ditolak", "Disetujui", "Menunggu"];
-
-  return Array.from({ length: count }, (_, i) => {
-    const first_name = pick(firstNames);
-    const last_name = pick(lastNames);
-    const joined = new Date();
-    joined.setDate(joined.getDate() - Math.floor(Math.random() * 365));
-    return {
-      id: i + 1,
-      first_name,
-      last_name,
-      email: `${first_name.toLowerCase()}.${last_name.toLowerCase()}@example.com`,
-      avatar: `https://i.pravatar.cc/150?img=${
-        Math.floor(Math.random() * 70) + 1
-      }`,
-      gender: pick(genders),
-      role: pick(roles),
-      verification_status: pick(verifs),
-      address: generateAddress(),
-      joined_at: joined.toISOString().split("T")[0],
-    };
-  });
+const statusLabel = (s) => {
+  const k = String(s || "").toLowerCase();
+  if (k === "approved") return "Disetujui";
+  if (k === "pending") return "Menunggu";
+  if (k === "rejected") return "Ditolak";
+  return "Tidak diketahui";
 };
 
-// thunk API (tetap ada); fallback ke dummy jika error
-export const getUsersContent = createAsyncThunk("/users/content", async () => {
-  try {
-    const res = await axios.get("/api/users?page=2", {});
-    return res.data;
-  } catch (e) {
-    console.warn("API users gagal, pakai dummy:", e?.message);
-    return { data: generateDummyUsers(20) };
+// LIST (paginated)
+export const getUsersContent = createAsyncThunk(
+  "user/list",
+  async ({ page = 1, per_page = 10, q = "" } = {}, { rejectWithValue }) => {
+    try {
+      const res = await UserService.listAdminUsers({ page, per_page, q });
+      return res; // { success, data, meta }
+    } catch (e) {
+      return rejectWithValue(
+        e?.response?.data || { message: "Gagal mengambil data" }
+      );
+    }
   }
-});
+);
+
+// DETAIL
+export const getUserDetail = createAsyncThunk(
+  "user/detail",
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await UserService.getAdminUserDetail(id);
+      return res; // { success, data:{... (harap sudah include roles+identity)} }
+    } catch (e) {
+      return rejectWithValue(
+        e?.response?.data || { message: "Gagal mengambil detail" }
+      );
+    }
+  }
+);
+
+// DELETE
+export const deleteUserById = createAsyncThunk(
+  "user/delete",
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await UserService.deleteAdminUser(id);
+      return { id, resp: res };
+    } catch (e) {
+      return rejectWithValue(
+        e?.response?.data || { message: "Gagal menghapus" }
+      );
+    }
+  }
+);
+
+const initialState = {
+  isLoading: false,
+  users: [],
+  raw: [],
+  meta: null,
+  detail: null,
+  error: null,
+  lastQuery: { page: 1, per_page: 10, q: "" },
+};
 
 const usersSlice = createSlice({
   name: "user",
-  initialState: { isLoading: false, users: [] },
+  initialState,
   reducers: {
-    addNewUser: (state, action) => {
-      const { newUserObj } = action.payload;
-      state.users = [...state.users, newUserObj];
+    clearDetail: (state) => {
+      state.detail = null;
     },
-    deleteUser: (state, action) => {
-      const { index } = action.payload;
-      state.users.splice(index, 1);
+    setLastQuery: (state, action) => {
+      state.lastQuery = { ...state.lastQuery, ...(action.payload || {}) };
     },
   },
-  extraReducers: {
-    [getUsersContent.pending]: (state) => {
+  extraReducers: (builder) => {
+    // LIST
+    builder.addCase(getUsersContent.pending, (state) => {
       state.isLoading = true;
-    },
-    [getUsersContent.fulfilled]: (state, action) => {
-      state.users = action.payload.data;
+      state.error = null;
+    });
+    builder.addCase(getUsersContent.fulfilled, (state, action) => {
       state.isLoading = false;
-    },
-    [getUsersContent.rejected]: (state) => {
+      state.error = null;
+
+      const payload = action.payload || {};
+      const arr = Array.isArray(payload.data) ? payload.data : [];
+      state.raw = arr;
+      state.meta = payload.meta || null;
+
+      state.users = arr.map((u) => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        telepon: u.telepon || "-",
+        gender: mapGender(u.gender),
+        address: u.address || "-",
+        // avatar prioritas: identity.file_photo -> user.file_avatar -> null
+        avatar: u.identity?.file_photo || u.file_avatar || null,
+        role: u.roles?.name ? u.roles.name : "-", // "penghadap"/"notaris"/"admin"
+        status_verification: statusLabel(u.status_verification),
+        status_raw: u.status_verification,
+        notes_verification: u.notes_verification,
+        created_at: u.created_at,
+      }));
+    });
+    builder.addCase(getUsersContent.rejected, (state, action) => {
       state.isLoading = false;
-    },
+      state.error = action.payload?.message || "Gagal memuat data";
+    });
+
+    // DETAIL
+    builder.addCase(getUserDetail.pending, (state) => {
+      state.detail = null;
+      state.error = null;
+    });
+    builder.addCase(getUserDetail.fulfilled, (state, action) => {
+      const d = action.payload?.data || {};
+      state.detail = {
+        id: d.id,
+        name: d.name,
+        email: d.email,
+        telepon: d.telepon || "-",
+        gender: mapGender(d.gender),
+        address: d.address || "-",
+        avatar: d.identity?.file_photo || d.file_avatar || null,
+        role: d.roles?.name || "-",
+        status_verification: statusLabel(d.status_verification),
+        status_raw: d.status_verification,
+        notes_verification: d.notes_verification,
+        created_at: d.created_at,
+        // identity full (agar modal bisa pakai langsung)
+        identity: d.identity || null,
+      };
+    });
+    builder.addCase(getUserDetail.rejected, (state, action) => {
+      state.detail = null;
+      state.error = action.payload?.message || "Gagal memuat detail";
+    });
+
+    // DELETE
+    builder.addCase(deleteUserById.fulfilled, (state, action) => {
+      const id = action.payload?.id;
+      if (id) {
+        state.users = state.users.filter((u) => u.id !== id);
+        state.raw = state.raw.filter((u) => u.id !== id);
+      }
+    });
   },
 });
 
-export const { addNewUser, deleteUser } = usersSlice.actions;
+export const { clearDetail, setLastQuery } = usersSlice.actions;
 export default usersSlice.reducer;
