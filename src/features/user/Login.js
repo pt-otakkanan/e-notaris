@@ -193,7 +193,7 @@ export default function Login() {
                 <button
                   type="submit"
                   className={
-                    "btn w-72 text-white text-lg rounded-full border-gray-300 p-2 bg-[#0256c4]"
+                    "btn w-72 text-white text-lg rounded-full border-gray-300 p-2 bg-[#0256c4] hover:bg-[#003782]"
                   }
                   style={{
                     width: "240px",

@@ -55,7 +55,7 @@ function Requirements() {
     <>
       <TitleCard title="Dokumen Tambahan" topMargin="mt-2">
         <div className="space-y-6">
-          <div className="text-sm text-gray-600 mb-6">
+          <div className="text-sm dark:text-[#ecfffd] mb-6">
             Upload dokumen-dokumen berikut untuk melengkapi verifikasi akun
             Anda. File yang diperbolehkan: PDF, JPG, JPEG, PNG (maksimal 5MB per
             file)
@@ -64,7 +64,7 @@ function Requirements() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FileInput
               labelTitle="File KTP"
-              labelStyle="after:content-['*'] after:ml-1 after:text-red-500"
+              labelStyle="after:content-['*'] after:ml-1 after:text-red-500 dark:text-[#ecfffd]"
               accept=".pdf,.jpg,.jpeg,.png"
               required
               maxSizeMB={2}
@@ -75,7 +75,7 @@ function Requirements() {
 
             <FileInput
               labelTitle="File NPWP"
-              labelStyle="after:content-['*'] after:ml-1 after:text-red-500"
+              labelStyle="after:content-['*'] after:ml-1 after:text-red-500 dark:text-[#ecfffd]"
               accept=".pdf,.jpg,.jpeg,.png"
               required
               maxSizeMB={2}
@@ -86,6 +86,7 @@ function Requirements() {
 
             <FileInput
               labelTitle="File NIB (Nomor Induk Berusaha)"
+              labelStyle="dark:text-[#ecfffd]"
               accept=".pdf,.jpg,.jpeg,.png"
               updateType="nib"
               maxSizeMB={2}
@@ -95,6 +96,7 @@ function Requirements() {
 
             <FileInput
               labelTitle="File TDP (Tanda Daftar Perusahaan)"
+              labelStyle="dark:text-[#ecfffd]"
               accept=".pdf,.jpg,.jpeg,.png"
               maxSizeMB={2}
               updateType="tdp"
@@ -106,7 +108,7 @@ function Requirements() {
 
         <div className="mt-8">
           <button
-            className="btn btn-primary float-right"
+            className="btn bg-[#0256c4] text-white hover:text-[#01043c] dark:bg-[#7b9cc9] dark:text-[#01043c] dark:hover:bg-gray-400 dark:hover:text-white float-right"
             onClick={updateDokumen}
           >
             Simpan Dokumen
