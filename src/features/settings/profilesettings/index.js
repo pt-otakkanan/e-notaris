@@ -306,6 +306,7 @@ function ProfileSettings() {
             updateFormValue={updateFormValue}
             updateType="name"
             isLoading={loadingProfile}
+            isRequired={true}
           />
           <InputText
             type="email"
@@ -385,6 +386,7 @@ function ProfileSettings() {
               updateFormValue={updateFormValue}
               updateType="nik"
               isLoading={loadingProfile}
+              isRequired={true}
             />
             <InputText
               labelTitle="NPWP"

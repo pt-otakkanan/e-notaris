@@ -46,9 +46,7 @@ const ScheduleService = {
 
   // DELETE by activity ID - jika ada endpoint khusus
   deleteByActivityId: async (activityId) => {
-    const { data } = await api.delete(
-      `/notaris/schedule/by-activity/${activityId}`
-    );
+    const { data } = await api.delete(`/notaris/schedule/${activityId}`);
     return data;
   },
 };

@@ -71,7 +71,7 @@ export default function DeedAddModalBody({ extraObject = {}, closeModal }) {
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4">
         <InputText
-          labelTitle="Nama Lengkap"
+          labelTitle="Nama Akta"
           value={form.name} // ⬅️ controlled
           updateFormValue={updateFormValue}
           updateType="name"
@@ -123,9 +123,7 @@ export default function DeedAddModalBody({ extraObject = {}, closeModal }) {
           Tutup
         </button>
         <button
-          className={`btn hover:text-black text-white bg-[#0256c4] w-36 ${
-            saving ? "loading" : ""
-          }`}
+          className={`btn hover:text-black text-white bg-[#0256c4] w-36 `}
           onClick={onSubmit}
           disabled={saving}
         >
