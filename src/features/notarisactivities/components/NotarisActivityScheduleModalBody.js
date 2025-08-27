@@ -10,6 +10,7 @@ export default function NotarisActivityScheduleModalBody({
 }) {
   const {
     activity = {},
+    schedules = [],
     existingSchedule = null,
     onSubmit,
   } = extraObject || {};
@@ -99,6 +100,7 @@ export default function NotarisActivityScheduleModalBody({
   const handleClearSchedule = () => {
     if (window.confirm("Yakin ingin menghapus jadwal ini?")) {
       const clearData = {
+        // ini harusnya schedules.id
         activityId: activity.id,
         isDelete: true,
       };
@@ -214,24 +216,24 @@ export default function NotarisActivityScheduleModalBody({
         </div>
       )}
 
-      <div className="flex justify-between pt-4">
-        <div>
+      <div className="flex justify-end pt-4">
+        {/* <div>
           {existingSchedule && (
             <button
-              className="btn btn-error btn-outline"
+              className="btn bg-red-600 text-white"
               onClick={handleClearSchedule}
             >
               Hapus Jadwal
             </button>
           )}
-        </div>
+        </div> */}
 
         <div className="flex gap-2">
           <button className="btn" onClick={closeModal}>
             Batal
           </button>
           <button
-            className="btn btn-primary"
+            className="btn bg-[#0256c4] text-white"
             onClick={handleSave}
             disabled={!form.date || !form.time || !form.location?.trim()}
           >

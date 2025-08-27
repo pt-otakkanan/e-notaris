@@ -286,7 +286,7 @@ export default function NotarisActivityAddModalBody({
           Tutup
         </button>
         <button
-          className={`btn bg-[] ${saving ? "loading" : ""}`}
+          className={`btn bg-[#0256c4] text-white`}
           onClick={handleSave}
           disabled={saving}
         >

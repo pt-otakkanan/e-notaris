@@ -1,200 +1,237 @@
+// src/features/notarisactivitiesclient/notarisActivitiesSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import moment from "moment";
+import NotarisActivityClientService from "../../services/notarisActivityClient.service";
 
-// Dummy generator lengkap
-const generateDummyActivities = (count = 10) => {
-  const jenisAktaList = [
-    "Akta Jual Beli",
-    "Akta Hibah",
-    "Akta Pernikahan",
-    "Akta Perjanjian",
-  ];
-  const statusList = ["Draft", "Menunggu", "Selesai"];
-
-  const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
-
-  const first = [
-    "Budi",
-    "Siti",
-    "Andi",
-    "Dewi",
-    "Agus",
-    "Rina",
-    "Joko",
-    "Lina",
-    "Tono",
-    "Fitri",
-  ];
-  const last = [
-    "Santoso",
-    "Aisyah",
-    "Wijaya",
-    "Putri",
-    "Haryanto",
-    "Kusuma",
-    "Pratama",
-    "Utami",
-    "Saputra",
-    "Wulandari",
-  ];
-  const phone = () =>
-    `08${rand(11, 99)}-${rand(1000, 9999)}-${rand(1000, 9999)}`;
-  const nik16 = () => String(1000000000000000 + rand(0, 899999999999999));
-
-  const addr = () => {
-    const streets = [
-      "Jl. Merdeka",
-      "Jl. Sudirman",
-      "Jl. Ahmad Yani",
-      "Jl. Diponegoro",
-      "Jl. Imam Bonjol",
-      "Jl. Pahlawan",
-    ];
-    const cities = [
-      "Surabaya",
-      "Sidoarjo",
-      "Gresik",
-      "Malang",
-      "Jakarta",
-      "Bandung",
-      "Semarang",
-    ];
-    const no = rand(1, 200);
-    const rt = String(rand(1, 10)).padStart(2, "0");
-    const rw = String(rand(1, 10)).padStart(2, "0");
-    const kodePos = String(10000 + rand(0, 89999));
-    return `${pick(streets)} No. ${no}, RT ${rt}/RW ${rw}, ${pick(
-      cities
-    )} ${kodePos}`;
-  };
-
-  // Generate dummy schedule data
-  const generateSchedule = (i) => {
-    // 70% kemungkinan ada jadwal
-    if (Math.random() > 0.3) {
-      const daysFromNow = rand(-7, 30); // 7 hari lalu sampai 30 hari ke depan
-      const hour = rand(8, 17);
-      const minute = rand(0, 1) * 30; // 0 atau 30 menit
-
-      const scheduledDate = moment()
-        .add(daysFromNow, "days")
-        .hour(hour)
-        .minute(minute)
-        .second(0)
-        .toISOString();
-
-      const locations = [
-        "Kantor Notaris - Jl. Sudirman No. 123, Surabaya",
-        "Rumah Klien - Sesuai alamat penghadap 1",
-        "Kantor Notaris - Jl. Ahmad Yani No. 45, Sidoarjo",
-        "Hotel Grand City - Meeting Room A",
-        "Kantor Bank BCA Cabang Surabaya",
-        "Rumah Penghadap 2",
-        "Kantor Notaris Cabang Gresik",
-      ];
-
-      const notesList = [
-        "Mohon membawa dokumen asli KTP dan KK. Dokumen fotocopy sudah disiapkan.",
-        "Pertemuan untuk penandatanganan akta. Harap datang tepat waktu.",
-        "Bawa materai 10.000 sebanyak 2 lembar. Dokumen lain sudah lengkap.",
-        "Meeting untuk pembacaan draft akta sebelum penandatanganan final.",
-        "Persiapkan bilik administrasi dan uang tunai untuk pembayaran.",
-        "",
-        "Konfirmasi kehadiran H-1 melalui WhatsApp atau telepon.",
-      ];
-
-      return {
-        scheduled_date: scheduledDate,
-        schedule_location: pick(locations),
-        schedule_notes: pick(notesList),
-        schedule_status: "confirmed",
-      };
-    }
-
-    return {
-      scheduled_date: null,
-      schedule_location: null,
-      schedule_notes: null,
-      schedule_status: null,
-    };
-  };
-
-  return Array.from({ length: count }, (_, i) => {
-    const p1_first = pick(first),
-      p1_last = pick(last);
-    const p2_first = pick(first),
-      p2_last = pick(last);
-
-    const scheduleData = generateSchedule(i);
-
-    return {
-      id: i + 1,
-      kode: `AKT-${String(1000 + i)}`,
-      jenis_akta: pick(jenisAktaList),
-      penghadap1: `${p1_first} ${p1_last}`,
-      penghadap2: `${p2_first} ${p2_last}`,
-      deskripsi:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-      status: pick(statusList),
-      draft_akta:
-        "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-      waktu: new Date(Date.now() - rand(0, 60) * 86400000).toISOString(),
-
-      // DETAIL TAMBAHAN
-      penghadap1_email: `${p1_first.toLowerCase()}.${p1_last.toLowerCase()}@example.com`,
-      penghadap2_email: `${p2_first.toLowerCase()}.${p2_last.toLowerCase()}@example.com`,
-      penghadap1_nik: nik16(),
-      penghadap2_nik: nik16(),
-      penghadap1_ktp: `https://picsum.photos/seed/ktp-${i + 1}-a/800/500`,
-      penghadap2_ktp: `https://picsum.photos/seed/ktp-${i + 1}-b/800/500`,
-      penghadap1_phone: phone(),
-      penghadap2_phone: phone(),
-      penghadap1_address: addr(),
-      penghadap2_address: addr(),
-
-      // SCHEDULE DATA
-      ...scheduleData,
-    };
-  });
+// ===== helpers =====
+const mapStatus = (s) => {
+  const k = String(s || "").toLowerCase();
+  if (k === "approved") return "Selesai";
+  if (k === "pending") return "Menunggu";
+  if (k === "rejected") return "Ditolak";
+  return "Tidak diketahui";
 };
 
+const mapApprovalStatus = (s) => {
+  const k = String(s || "").toLowerCase();
+  if (k === "approved") return "Disetujui";
+  if (k === "pending") return "Menunggu";
+  if (k === "rejected") return "Ditolak";
+  return "Tidak diketahui";
+};
+
+const pickRel = (row, key) =>
+  row?.[key] || row?.[key.replace(/_([a-z])/g, (_, c) => c.toUpperCase())];
+
+// ===== state =====
+const initialState = {
+  isLoading: false,
+  items: [],
+  meta: null,
+  error: null,
+  lastQuery: { search: "", status: "", page: 1, per_page: 10 },
+  // detail cache opsional
+  detail: null,
+  isLoadingDetail: false,
+};
+
+// ===== thunks =====
 export const getNotarisActivitiesContent = createAsyncThunk(
-  "/notarisActivities/content",
-  async () => {
+  "notarisActivitiesClient/list",
+  async (query = {}, { getState, rejectWithValue }) => {
     try {
-      const res = await axios.get("/api/notaris-activities");
-      return res.data;
+      const { notarisActivities = {} } = getState();
+      // jika tidak ada query masuk, gunakan lastQuery dari slice client sendiri
+      const q = { ...initialState.lastQuery, ...(query || {}) };
+      const data = await NotarisActivityClientService.list(q);
+      return { data, query: q };
     } catch (e) {
-      console.warn("API gagal, pakai dummy:", e?.message);
-      return { data: generateDummyActivities(10) };
+      return rejectWithValue(
+        e?.response?.data || { message: "Gagal memuat aktivitas" }
+      );
     }
   }
 );
 
+export const getNotarisActivityDetail = createAsyncThunk(
+  "notarisActivitiesClient/detail",
+  async (id, { rejectWithValue }) => {
+    try {
+      const data = await NotarisActivityClientService.detail(id);
+      return data;
+    } catch (e) {
+      return rejectWithValue(
+        e?.response?.data || { message: "Gagal memuat detail aktivitas" }
+      );
+    }
+  }
+);
+
+export const approveClientActivity = createAsyncThunk(
+  "notarisActivitiesClient/approve",
+  async ({ id, notes = "" }, { dispatch, rejectWithValue, getState }) => {
+    try {
+      await NotarisActivityClientService.clientApproval(id, {
+        approval_status: "approved",
+        ...(notes ? { notes } : {}),
+      });
+      const { notarisActivitiesClient } = getState();
+      await dispatch(
+        getNotarisActivitiesContent(notarisActivitiesClient?.lastQuery)
+      );
+      return true;
+    } catch (e) {
+      console.log(e);
+      return rejectWithValue(
+        e?.response?.data || { message: "Gagal menyetujui aktivitas" }
+      );
+    }
+  }
+);
+
+export const rejectClientActivity = createAsyncThunk(
+  "notarisActivitiesClient/reject",
+  async ({ id, notes = "" }, { dispatch, rejectWithValue, getState }) => {
+    try {
+      await NotarisActivityClientService.clientApproval(id, {
+        approval_status: "rejected",
+        ...(notes ? { notes } : {}),
+      });
+      const { notarisActivitiesClient } = getState();
+      await dispatch(
+        getNotarisActivitiesContent(notarisActivitiesClient?.lastQuery)
+      );
+      return true;
+    } catch (e) {
+      return rejectWithValue(
+        e?.response?.data || { message: "Gagal menolak aktivitas" }
+      );
+    }
+  }
+);
+
+// (opsional) agar import lama tidak error jika masih ada:
+// tidak dipakai oleh client/penghadap, tapi biar aman kalau ter-import.
+export const deleteNotarisActivity = createAsyncThunk(
+  "notarisActivitiesClient/delete",
+  async () => {
+    throw new Error(
+      "Penghadap tidak memiliki akses untuk menghapus aktivitas."
+    );
+  }
+);
+
+// ===== slice =====
 const slice = createSlice({
-  name: "notarisActivities",
-  initialState: { isLoading: false, items: [] },
+  name: "notarisActivitiesClient",
+  initialState,
   reducers: {
-    deleteNotarisActivity: (state, action) => {
-      const { index } = action.payload;
-      state.items.splice(index, 1);
+    setClientLastQuery: (state, action) => {
+      state.lastQuery = { ...state.lastQuery, ...(action.payload || {}) };
+    },
+    clearClientDetail: (state) => {
+      state.detail = null;
     },
   },
-  extraReducers: {
-    [getNotarisActivitiesContent.pending]: (state) => {
-      state.isLoading = true;
-    },
-    [getNotarisActivitiesContent.fulfilled]: (state, action) => {
-      state.items = action.payload.data;
-      state.isLoading = false;
-    },
-    [getNotarisActivitiesContent.rejected]: (state) => {
-      state.isLoading = false;
-    },
+  extraReducers: (builder) => {
+    builder
+      // list
+      .addCase(getNotarisActivitiesContent.pending, (state, action) => {
+        state.isLoading = true;
+        state.error = null;
+        if (action.meta?.arg)
+          state.lastQuery = { ...state.lastQuery, ...action.meta.arg };
+      })
+      .addCase(getNotarisActivitiesContent.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.error = null;
+
+        const payload = action.payload?.data || {};
+        const arr = Array.isArray(payload.data) ? payload.data : [];
+        state.meta = payload.meta || null;
+
+        state.items = arr.map((it) => {
+          const deed = pickRel(it, "deed");
+          const first = pickRel(it, "first_client");
+          const second = pickRel(it, "second_client");
+          const schedules = it.schedules || [];
+          const firstSchedule = schedules[0] || null;
+
+          // gabung tanggal + jam jadi "YYYY-MM-DD HH:mm"
+          let schedule_id = null;
+          let scheduled_date = null;
+          let schedule_location = null;
+          let schedule_notes = null;
+          let schedule_status = null;
+
+          if (firstSchedule) {
+            const ymd = (firstSchedule.date || "").slice(0, 10);
+            const t = firstSchedule.time || "00:00";
+            scheduled_date = ymd ? `${ymd} ${t}` : null;
+            schedule_location = firstSchedule.location || null;
+            schedule_notes = firstSchedule.notes || null;
+            schedule_status = firstSchedule.status || null;
+            schedule_id = firstSchedule.id || null;
+          }
+
+          return {
+            id: it.id,
+            kode: it.tracking_code,
+            nama: it.name,
+            jenis_akta: deed?.name || "-",
+            penghadap1: first?.name || "-",
+            penghadap2: second?.name || (second === null ? "-" : ""),
+            penghadap1_email: first?.email || "-",
+            penghadap2_email: second?.email || "-",
+            status_raw: it.status_approval,
+            status: mapStatus(it.status_approval),
+
+            // approval penghadap
+            status_penghadap1_raw: it.first_client_approval,
+            status_penghadap1: mapApprovalStatus(it.first_client_approval),
+            status_penghadap2_raw: it.second_client_approval,
+            status_penghadap2: mapApprovalStatus(it.second_client_approval),
+
+            draft_akta: it.draft_file || null,
+
+            // schedule
+            scheduled_date,
+            schedule_location,
+            schedule_notes,
+            schedule_status,
+            schedule_id,
+          };
+        });
+      })
+      .addCase(getNotarisActivitiesContent.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload?.message || "Gagal memuat aktivitas";
+      })
+
+      // detail
+      .addCase(getNotarisActivityDetail.pending, (state) => {
+        state.isLoadingDetail = true;
+        state.error = null;
+      })
+      .addCase(getNotarisActivityDetail.fulfilled, (state, action) => {
+        state.isLoadingDetail = false;
+        const d = action.payload?.data || null;
+        state.detail = d;
+      })
+      .addCase(getNotarisActivityDetail.rejected, (state, action) => {
+        state.isLoadingDetail = false;
+        state.error =
+          action.payload?.message || "Gagal memuat detail aktivitas";
+      })
+
+      // approve/reject error handling
+      .addCase(approveClientActivity.rejected, (state, action) => {
+        state.error = action.payload?.message || "Gagal menyetujui aktivitas";
+      })
+      .addCase(rejectClientActivity.rejected, (state, action) => {
+        state.error = action.payload?.message || "Gagal menolak aktivitas";
+      });
   },
 });
 
-export const { deleteNotarisActivity } = slice.actions;
+export const { setClientLastQuery, clearClientDetail } = slice.actions;
 export default slice.reducer;

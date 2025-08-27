@@ -77,12 +77,10 @@ export default function ConfirmationModalBody({
       {needReason && (
         <TextAreaInput
           labelTitle="Alasan Penolakan"
-          labelStyle="font-medium"
-          containerStyle="mt-6"
-          defaultValue=""
-          placeholder="Masukkan alasan penolakan"
-          updateType="REASON"
+          value=""
           updateFormValue={updateFormValue}
+          updateType="description"
+          placeholder="Deskripsi singkat akta…"
         />
       )}
 

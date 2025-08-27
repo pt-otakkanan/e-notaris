@@ -12,6 +12,7 @@ function InputText({
   disabled = false,
   isLoading = false,
   className = "input input-bordered w-full dark:bg-[#01043c]", // bg gelapnya input
+  isRequired = false,
 }) {
   const id = useId();
 
@@ -20,7 +21,7 @@ function InputText({
       {labelTitle && (
         <label className="label" htmlFor={id}>
           <span className={`label-text text-base-content ${labelStyle}`}>
-            {labelTitle}
+            {labelTitle} {isRequired && <span className="text-red-500">*</span>}
           </span>
         </label>
       )}
