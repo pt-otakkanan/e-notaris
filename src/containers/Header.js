@@ -145,15 +145,29 @@ function Header() {
               className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 dark:bg-[#0b0255] rounded-box w-52"
             >
               <li className="justify-between">
-                <Link to={"/app/settings-profile"}>Profile Settings</Link>
+                <Link
+                  to={"/app/settings-profile"}
+                  className="!bg-transparent active:!bg-[#0256c4] dark:active:!bg-[#6da0e2] dark:active:!text-[#01043c]"
+                >
+                  Profile Settings
+                </Link>
               </li>
               <li className="">
-                <Link to={"/app/settings-billing"}>Bill History</Link>
+                <Link
+                  to={"/app/settings-billing"}
+                  className="!bg-transparent active:!bg-[#0256c4] dark:active:!bg-[#6da0e2] dark:active:!text-[#01043c]"
+                >
+                  Bill History
+                </Link>
               </li>
               <div className="divider mt-0 mb-0"></div>
               <li>
                 {/* gunakan button agar tidak ikut behavior <a> */}
-                <button type="button" onClick={logoutUser}>
+                <button
+                  type="button"
+                  onClick={logoutUser}
+                  className="!bg-transparent active:!bg-[#0256c4] dark:active:!bg-[#6da0e2] dark:active:!text-[#01043c]"
+                >
                   Logout
                 </button>
               </li>

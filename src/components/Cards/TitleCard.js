@@ -4,7 +4,7 @@ function TitleCard({ title, children, topMargin, TopSideButtons }) {
   return (
     <div
       className={
-        "card w-full p-6 bg-base-100 dark:bg-[#0b0255] shadow-xl " +
+        "card w-full p-6 bg-base-100 dark:bg-[#0b0255] dark:text-[#ecfffd] shadow-xl " +
         (topMargin || "mt-6")
       }
     >

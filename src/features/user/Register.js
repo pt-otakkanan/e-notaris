@@ -232,7 +232,7 @@ export default function Register() {
                 <button
                   type="submit"
                   className={
-                    "btn mt-1 w-60 mt-6 border-r-0 text-white text-lg rounded-full border-gray-300 p-2 w-72 bg-[#0256c4]"
+                    "btn mt-4 w-72 text-white text-lg rounded-full border-gray-300 p-2 bg-[#0256c4] hover:bg-[#003782]"
                   }
                   style={{
                     width: "240px",
