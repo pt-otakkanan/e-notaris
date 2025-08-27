@@ -20,7 +20,7 @@ function ForgotPassword() {
     setErrorMessage("");
 
     if (userObj.emailId.trim() === "")
-      return setErrorMessage("Email Id is required! (use any value)");
+      return setErrorMessage("Email wajib diisi!");
     else {
       setLoading(true);
       // Call API
@@ -35,19 +35,9 @@ function ForgotPassword() {
   };
 
   return (
-    <div
-      className="min-h-screen bg-base-200 flex items-center"
-      style={{
-        backgroundColor: "#ccb0b2",
-      }}
-    >
+    <div className="min-h-screen bg-gray-200 flex items-center">
       <div className="card mx-auto w-full max-w-5xl  shadow-xl">
-        <div
-          className="grid  md:grid-cols-2 grid-cols-1  bg-base-100 rounded-none md:rounded-xl"
-          style={{
-            background: "linear-gradient(180deg, #ffffff 0%, #ccb0b2 100%)",
-          }}
-        >
+        <div className="grid  md:grid-cols-2 grid-cols-1  bg-white rounded-none md:rounded-xl">
           <div
             className="rounded-xl"
             style={{
@@ -56,7 +46,7 @@ function ForgotPassword() {
           >
             <LandingIntro />
           </div>
-          <div className="py-24 px-10">
+          <div className="py-24 px-10 max-h-[87vh] overflow-y-auto">
             <h2 className="text-3xl font-bold mb-1 mt-[50px] text-center text-black">
               Lupa Kata Sandi
             </h2>
@@ -86,6 +76,8 @@ function ForgotPassword() {
                   Kami akan mengirimkan tautan reset kata sandi <br></br> ke
                   email Anda.
                 </p>
+
+                <ErrorText styleClass="mt-12">{errorMessage}</ErrorText>
                 <form onSubmit={(e) => submitForm(e)}>
                   <div className="mb-4">
                     <InputTextAuth
@@ -94,20 +86,19 @@ function ForgotPassword() {
                       updateType="emailId"
                       containerStyle="mt-4"
                       labelTitle="Email"
+                      placeholder="Masukkan email"
                       updateFormValue={updateFormValue}
                     />
                   </div>
 
-                  <ErrorText styleClass="mt-12">{errorMessage}</ErrorText>
-                  <div className="text-center">
+                  <div className="justify-center text-center mt-8">
                     <button
                       type="submit"
                       className={
-                        "btn mt-1 w-60 border-r-0 text-white text-lg rounded-full border-gray-300 p-2 w-72 placeholder-gray-500" +
+                        "btn w-72 text-white text-lg rounded-full border-gray-300 p-2 bg-[#0256c4] hover:bg-[#003782]" +
                         (loading ? " loading" : "")
                       }
                       style={{
-                        backgroundColor: "#474747",
                         width: "240px",
                         height: "45px",
                       }}

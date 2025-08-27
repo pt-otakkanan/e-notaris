@@ -410,7 +410,7 @@ function ProfileSettings() {
             <FileInput
               labelTitle="File Kartu Keluarga"
               accept=".jpg,.jpeg,.png"
-              required={!serverIdentity?.file_kk}
+              required
               maxSizeMB={2}
               updateType="kk"
               updateFormValue={updateFormValue}
