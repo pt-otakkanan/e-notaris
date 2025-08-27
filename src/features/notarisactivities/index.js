@@ -64,7 +64,7 @@ function NotarisActivities() {
       openModal({
         title: "Detail Aktivitas Notaris",
         bodyType: MODAL_BODY_TYPES.NOTARIS_ACTIVITY_DETAIL,
-        extraObject: row.id, // atau row
+        extraObject: row.id,
         size: "lg",
       })
     );
@@ -290,9 +290,9 @@ function NotarisActivities() {
       <div className="join hidden md:inline-flex">
         {[
           { v: "", label: "Semua" },
-          { v: "pending", label: "Pending" },
-          { v: "approved", label: "Approved" },
-          { v: "rejected", label: "Rejected" },
+          { v: "pending", label: "Menunggu" },
+          { v: "approved", label: "Disetujui" },
+          { v: "rejected", label: "Ditolak" },
         ].map((t) => (
           <button
             key={t.v || "all"}

@@ -155,9 +155,9 @@ function IdentityVerifications() {
       {/* Tabs status */}
       <div className="join hidden md:inline-flex">
         {[
-          { v: "pending", label: "Pending" },
-          { v: "approved", label: "Approved" },
-          { v: "rejected", label: "Rejected" },
+          { v: "pending", label: "Menunggu" },
+          { v: "approved", label: "Disetujui" },
+          { v: "rejected", label: "Ditolak" },
           // { v: "rejected-pending", label: "Rejected+Pending" },
           { v: "all", label: "Semua" },
         ].map((t) => (
